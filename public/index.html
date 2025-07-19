@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheckMyLinks - Dead Link Checker Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1d4ed8;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #1d4ed8;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: #ffffff !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: #ffffff !important;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            color: #ffffff !important;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #ffffff !important;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            color: #ffffff !important;
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #111827;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .checker-section {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 3rem;
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .dashboard {
+            display: none;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard.active {
+            display: grid;
+        }
+
+        .sidebar {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #6b7280;
+            padding: 0.5rem;
+            display: block;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .main-content {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .links-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .links-table th {
+            background: #f9fafb;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .links-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .links-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-redirect {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #111827;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0.5rem;
+        }
+
+        .close-btn:hover {
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .scan-item {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .scan-url {
+            font-weight: 600;
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .scan-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .scan-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .scan-status.processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .scan-status.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .scan-status.failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .scan-meta {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .features {
+            padding: 4rem 0;
+            background: #ffffff;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #111827;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .pricing {
+            padding: 4rem 0;
+            background: #f9fafb;
+        }
+
+        .pricing h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #111827;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .pricing-card .features {
+            flex-grow: 1;
+        }
+
+        .pricing-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+        }
+
+        .pricing-card.featured {
+            border-color: #3b82f6;
+            position: relative;
+        }
+
+        .pricing-card.featured::before {
+            content: "Most Popular";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .price-period {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .features li {
+            padding: 0.5rem 0;
+            color: #4b5563;
+        }
+
+        .features li::before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #111827;
+            color: #d1d5db;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo"><a href="#" onclick="goHome()" style="text-decoration: none; color: inherit;">CheckMyLinks</a></div>
+            <div class="nav-links" id="navLinks">
+                <a href="#" onclick="showFeaturesPage()">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#" onclick="openModal('login')">Login</a>
+                <a href="#" class="btn" onclick="openModal('signup')">Sign Up Free</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Public Homepage -->
+        <div id="homepage">
+            <section class="hero container">
+                <h1>Find Broken Links on Your Website</h1>
+                <p>Scan any website for dead links, improve SEO, and enhance user experience with our powerful link checker</p>
+            </section>
+
+            <section class="container">
+                <div class="checker-section">
+                    <div class="url-input-group">
+                        <input type="url" class="url-input" id="urlInput" placeholder="Enter website URL (e.g., https://example.com)">
+                        <button class="btn" onclick="scanWebsite()">
+                            Scan Website
+                        </button>
+                    </div>
+
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Scanning website for broken links...</p>
+                    </div>
+
+                    <div class="results" id="results">
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalLinks">0</div>
+                                <div class="stat-label">Total Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="brokenLinks">0</div>
+                                <div class="stat-label">Broken Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="okLinks">0</div>
+                                <div class="stat-label">Working Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="redirects">0</div>
+                                <div class="stat-label">Redirects</div>
+                            </div>
+                        </div>
+
+                        <table class="links-table">
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Found On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linksTableBody">
+                            </tbody>
+                        </table>
+
+                        <div class="export-buttons">
+                            <button class="btn" onclick="exportCSV()">Export CSV</button>
+                            <button class="btn btn-secondary" onclick="exportPDF()">Export PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pricing" id="pricing">
+                <div class="container">
+                    <h2>Simple Pricing</h2>
+                    <div class="pricing-cards">
+                        <div class="pricing-card">
+                            <h3>Free</h3>
+                            <div class="price">$0<span class="price-period">/month</span></div>
+                            <ul class="features">
+                                <li>50 links per scan</li>
+                                <li>5 scans per month</li>
+                                <li>Basic reports</li>
+                                <li>Email support</li>
+                            </ul>
+                            <button class="btn" onclick="openModal('signup')">Get Started</button>
+                        </div>
+                        <div class="pricing-card featured">
+                            <h3>Pro</h3>
+                            <div class="price">$19<span class="price-period">/month</span></div>
+                            <ul class="features">
+                                <li>Unlimited links per scan</li>
+                                <li>Unlimited scans</li>
+                                <li>Advanced reports</li>
+                                <li>CSV/PDF export</li>
+                                <li>Email notifications</li>
+                                <li>Priority support</li>
+                            </ul>
+                            <button class="btn" onclick="openModal('signup')">Start Free Trial</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Features Page -->
+        <div id="featuresPage" style="display: none;">
+            <section class="hero container">
+                <h1>Powerful Features</h1>
+                <p>Everything you need to keep your website links healthy and your SEO optimized</p>
+            </section>
+
+            <section class="features">
+                <div class="container">
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3>Lightning Fast Scanning</h3>
+                            <p>Our optimized algorithm can check hundreds of links in seconds. Get results quickly without compromising accuracy.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3>Detailed Reports</h3>
+                            <p>Comprehensive reports with HTTP status codes, response times, error details, and actionable insights for every link.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📧</div>
+                            <h3>Email Notifications</h3>
+                            <p>Receive instant alerts when scans complete or broken links are discovered. Stay informed without constant checking.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📈</div>
+                            <h3>Historical Tracking</h3>
+                            <p>Monitor your website health over time with scan history, trends, and progress tracking to measure improvements.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔄</div>
+                            <h3>Bulk Website Scanning</h3>
+                            <p>Scan entire websites with unlimited depth. Check thousands of pages and links in a single comprehensive scan.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">💾</div>
+                            <h3>Export & Share</h3>
+                            <p>Download detailed scan results as CSV or PDF files. Perfect for sharing with teams or including in reports.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3>SEO Optimization</h3>
+                            <p>Improve your search rankings by fixing broken links. Our tool helps maintain excellent user experience and SEO health.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h3>Secure & Private</h3>
+                            <p>Your data is secure with enterprise-grade encryption. We never store your website content or share your information.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⏰</div>
+                            <h3>Scheduled Scans</h3>
+                            <p>Set up automated scans to run daily, weekly, or monthly. Never miss a broken link with proactive monitoring.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="container" style="padding: 4rem 0; text-align: center;">
+                <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p style="font-size: 1.25rem; color: #6b7280; margin-bottom: 2rem;">Join thousands of website owners who trust CheckMyLinks</p>
+                <button class="btn" onclick="openModal('signup')" style="font-size: 1.125rem; padding: 1rem 2rem;">Start Free Trial</button>
+            </section>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="dashboardSection" class="container dashboard">
+            <div class="sidebar">
+                <h3>Dashboard</h3>
+                <ul>
+                    <li><a href="#" class="active" onclick="showDashboardTab('overview')">Overview</a></li>
+                    <li><a href="#" onclick="showDashboardTab('scans')">Recent Scans</a></li>
+                    <li><a href="#" onclick="showDashboardTab('analytics')">Analytics</a></li>
+                    <li><a href="#" onclick="showDashboardTab('settings')">Settings</a></li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <div id="overviewTab">
+                    <h2>Welcome back, <span id="userName"></span>!</h2>
+                    <p>Monitor your website's health with our link checking tools.</p>
+                    
+                    <div class="checker-section" style="margin-top: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">Run New Scan</h3>
+                        <div class="url-input-group">
+                            <input type="url" class="url-input" id="dashboardUrlInput" placeholder="Enter website URL (e.g., https://example.com)">
+                            <button class="btn" onclick="scanWebsiteDashboard()">
+                                Scan Website
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="dashboardLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Scanning website for broken links...</p>
+                    </div>
+
+                    <div class="results" id="dashboardResults">
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardTotalLinks">0</div>
+                                <div class="stat-label">Total Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardBrokenLinks">0</div>
+                                <div class="stat-label">Broken Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardOkLinks">0</div>
+                                <div class="stat-label">Working Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardRedirects">0</div>
+                                <div class="stat-label">Redirects</div>
+                            </div>
+                        </div>
+
+                        <table class="links-table">
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Found On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardLinksTableBody">
+                            </tbody>
+                        </table>
+
+                        <div class="export-buttons">
+                            <button class="btn" onclick="exportDashboardCSV()">Export CSV</button>
+                            <button class="btn btn-secondary" onclick="exportDashboardPDF()">Export PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="scansTab" style="display: none;">
+                    <h2>Recent Scans</h2>
+                    <div id="scansList">
+                        <p>Loading scans...</p>
+                    </div>
+                </div>
+
+                <div id="analyticsTab" style="display: none;">
+                    <h2>Analytics & Insights</h2>
+                    <div class="stats" style="margin-bottom: 2rem;">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalScansCount">0</div>
+                            <div class="stat-label">Total Scans</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalLinksChecked">0</div>
+                            <div class="stat-label">Links Checked</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalBrokenFound">0</div>
+                            <div class="stat-label">Broken Links Found</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="monthlyScansCount">0</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card" style="text-align: left; margin-bottom: 2rem;">
+                        <h3>📧 Email Notifications</h3>
+                        <p>Get notified when scans complete or broken links are found</p>
+                        <div style="margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="emailNotifications" checked> 
+                                Enable email notifications
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="text-align: left;">
+                        <h3>⏰ Scheduled Scans (Coming Soon)</h3>
+                        <p>Set up automated scans to run daily, weekly, or monthly</p>
+                        <button class="btn btn-secondary" disabled style="margin-top: 1rem;">Available in Pro Plan</button>
+                    </div>
+                </div>
+
+                <div id="settingsTab" style="display: none;">
+                    <h2>Account Settings</h2>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="userEmail" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="userNameInput">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Plan</label>
+                        <input type="text" id="userPlan" readonly>
+                    </div>
+                    <button class="btn" onclick="updateProfile()">Update Profile</button>
+                    <button class="btn btn-danger" onclick="logout()" style="margin-left: 1rem;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 CheckMyLinks. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login to Your Account</h2>
+                <button class="close-btn" onclick="closeModal('login')">&times;</button>
+            </div>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%">Login</button>
+                <p style="text-align: center; margin-top: 1rem; color: #6b7280;">
+                    Don't have an account? <a href="#" onclick="closeModal('login'); openModal('signup')" style="color: #3b82f6;">Sign up</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Start Your Free Trial</h2>
+                <button class="close-btn" onclick="closeModal('signup')">&times;</button>
+            </div>
+            <div id="signupAlert"></div>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required minlength="6">
+                </div>
+                <button type="submit" class="btn" style="width: 100%">Create Account</button>
+                <p style="text-align: center; margin-top: 1rem; color: #6b7280;">
+                    Already have an account? <a href="#" onclick="closeModal('signup'); openModal('login')" style="color: #3b82f6;">Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = '/api';
+
+        // Auth state
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        let currentScanId = null;
+
+        // Check if user is logged in on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (authToken) {
+                checkAuthStatus();
+            }
+        });
+
+        // Show alert message
+        function showAlert(message, type = 'success', elementId = null) {
+            const alertClass = `alert alert-${type}`;
+            const alertHTML = `<div class="${alertClass}">${message}</div>`;
+            
+            if (elementId) {
+                document.getElementById(elementId).innerHTML = alertHTML;
+                setTimeout(() => {
+                    document.getElementById(elementId).innerHTML = '';
+                }, 5000);
+            } else {
+                // Show global alert
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = alertClass;
+                alertDiv.textContent = message;
+                alertDiv.style.position = 'fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.minWidth = '300px';
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Check auth status
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/scans`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    updateUIForAuth(true);
+                    loadDashboardData();
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                logout();
+            }
+        }
+
+        // Update UI based on auth status - FIXED VERSION
+        function updateUIForAuth(isLoggedIn) {
+            const navLinks = document.getElementById('navLinks');
+            const homepage = document.getElementById('homepage');
+            const dashboard = document.getElementById('dashboardSection');
+            const featuresPage = document.getElementById('featuresPage');
+            
+            if (isLoggedIn && currentUser) {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showHomepage()">Home</a>
+                    <a href="#" onclick="showFeaturesPage()">Features</a>
+                    <a href="#" onclick="showDashboard()">Dashboard</a>
+                    <span style="color: #6b7280;">Welcome, ${currentUser.name}!</span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                `;
+                homepage.style.display = 'none';
+                featuresPage.style.display = 'none';
+                dashboard.classList.add('active');
+            } else {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showFeaturesPage()">Features</a>
+                    <a href="#" onclick="goHome(); scrollToPricing()">Pricing</a>
+                    <a href="#" onclick="openModal('login')">Login</a>
+                    <a href="#" class="btn" onclick="openModal('signup')">Sign Up Free</a>
+                `;
+                homepage.style.display = 'block';
+                featuresPage.style.display = 'none';
+                dashboard.classList.remove('active');
+            }
+        }
+
+        // Go home function
+        function goHome() {
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+        }
+
+        // Scroll to pricing section
+        function scrollToPricing() {
+            setTimeout(() => {
+                const pricingSection = document.getElementById('pricing');
+                if (pricingSection) {
+                    pricingSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        }
+
+        // Show features page - FIXED VERSION
+        function showFeaturesPage() {
+            console.log('showFeaturesPage called'); // Debug log
+            
+            // Hide all other sections
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+            
+            // Show features page
+            document.getElementById('featuresPage').style.display = 'block';
+        }
+
+        // Show homepage
+        function showHomepage() {
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.add('active');
+            loadDashboardData();
+        }
+
+        // Show dashboard tab
+        function showDashboardTab(tab) {
+            // Hide all tabs
+            document.getElementById('overviewTab').style.display = 'none';
+            document.getElementById('scansTab').style.display = 'none';
+            document.getElementById('analyticsTab').style.display = 'none';
+            document.getElementById('settingsTab').style.display = 'none';
+            
+            // Show selected tab
+            document.getElementById(tab + 'Tab').style.display = 'block';
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load tab-specific data
+            if (tab === 'scans') {
+                loadUserScans();
+            } else if (tab === 'settings') {
+                loadUserSettings();
+            } else if (tab === 'analytics') {
+                loadUserAnalytics();
+            }
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+            }
+        }
+
+        // Load user analytics
+        async function loadUserAnalytics() {
+            try {
+                const response = await fetch(`${API_BASE}/user/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalScansCount').textContent = stats.total_scans || 0;
+                    document.getElementById('totalLinksChecked').textContent = stats.total_links_checked || 0;
+                    document.getElementById('totalBrokenFound').textContent = stats.total_broken_links || 0;
+                    document.getElementById('monthlyScansCount').textContent = stats.monthly_scans || 0;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Load user settings
+        function loadUserSettings() {
+            if (currentUser) {
+                document.getElementById('userEmail').value = currentUser.email;
+                document.getElementById('userNameInput').value = currentUser.name;
+                document.getElementById('userPlan').value = currentUser.plan || 'free';
+            }
+        }
+
+        // Load user scans
+        async function loadUserScans() {
+            try {
+                const response = await fetch(`${API_BASE}/scans`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayUserScans(data.scans || []);
+                } else {
+                    document.getElementById('scansList').innerHTML = '<p>Failed to load scans.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading scans:', error);
+                document.getElementById('scansList').innerHTML = '<p>Error loading scans.</p>';
+            }
+        }
+
+        // Display user scans
+        function displayUserScans(scans) {
+            const scansList = document.getElementById('scansList');
+            
+            if (scans.length === 0) {
+                scansList.innerHTML = '<p>No scans yet. Start by scanning your first website!</p>';
+                return;
+            }
+            
+            let html = '';
+            scans.forEach(scan => {
+                const date = new Date(scan.created_at).toLocaleDateString();
+                const time = new Date(scan.created_at).toLocaleTimeString();
+                
+                html += `
+                    <div class="scan-item">
+                        <div class="scan-header">
+                            <a href="${scan.url}" target="_blank" class="scan-url">${scan.url}</a>
+                            <span class="scan-status ${scan.status}">${scan.status}</span>
+                        </div>
+                        <div class="scan-meta">
+                            <span>Scanned on ${date} at ${time}</span>
+                            ${scan.total_links ? ` • ${scan.total_links} links checked` : ''}
+                            ${scan.broken_links ? ` • ${scan.broken_links} broken links` : ''}
+                        </div>
+                        ${scan.status === 'completed' ? `<button class="btn" onclick="viewScanDetails(${scan.id})" style="margin-top: 0.5rem;">View Details</button>` : ''}
+                    </div>
+                `;
+            });
+            
+            scansList.innerHTML = html;
+        }
+
+        // View scan details
+        async function viewScanDetails(scanId) {
+            try {
+                const response = await fetch(`${API_BASE}/scans/${scanId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const scan = await response.json();
+                    // Switch to overview tab and display results
+                    showDashboardTab('overview');
+                    
+                    // Display results in dashboard
+                    const displayData = {
+                        stats: {
+                            total: scan.total_links,
+                            broken: scan.broken_links,
+                            ok: scan.total_links - scan.broken_links,
+                            redirects: 0
+                        },
+                        results: scan.results || [],
+                        url: scan.url
+                    };
+                    displayDashboardResults(displayData);
+                }
+            } catch (error) {
+                console.error('Error loading scan details:', error);
+                showAlert('Failed to load scan details', 'error');
+            }
+        }
+
+        // Update profile
+        async function updateProfile() {
+            const name = document.getElementById('userNameInput').value;
+            
+            if (!name.trim()) {
+                showAlert('Name is required', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/user/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name })
+                });
+                
+                if (response.ok) {
+                    currentUser.name = name;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateUIForAuth(true);
+                    showAlert('Profile updated successfully', 'success');
+                } else {
+                    showAlert('Failed to update profile', 'error');
+                }
+            } catch (error) {
+                console.error('Profile update error:', error);
+                showAlert('Network error. Please try again.', 'error');
+            }
+        }
+
+        // Scan website function (public)
+        async function scanWebsite() {
+            const url = document.getElementById('urlInput').value;
+            if (!url) {
+                showAlert('Please enter a URL', 'warning');
+                return;
+            }
+
+            // Validate URL
+            try {
+                new URL(url);
+            } catch (e) {
+                showAlert('Please enter a valid URL', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').classList.remove('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/public/scan`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResults(data);
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Scan failed', 'error');
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Scan error:', error);
+                showAlert('Network error. Please try again.', 'error');
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Scan website function (dashboard)
+        async function scanWebsiteDashboard() {
+            const url = document.getElementById('dashboardUrlInput').value;
+            if (!url) {
+                showAlert('Please enter a URL', 'warning');
+                return;
+            }
+
+            // Validate URL
+            try {
+                new URL(url);
+            } catch (e) {
+                showAlert('Please enter a valid URL', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('dashboardLoading').style.display = 'block';
+            document.getElementById('dashboardResults').classList.remove('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/scans`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                if (response.ok) {
+                    const scan = await response.json();
+                    currentScanId = scan.id;
+                    // Poll for results
+                    pollScanStatus(scan.id, 'dashboard');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Scan failed', 'error');
+                    document.getElementById('dashboardLoading').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Dashboard scan error:', error);
+                showAlert('Network error. Please try again.', 'error');
+                document.getElementById('dashboardLoading').style.display = 'none';
+            }
+        }
+
+        // Poll for scan results (authenticated scans)
+        async function pollScanStatus(scanId, context = 'public') {
+            const pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/scans/${scanId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const scan = await response.json();
+                        
+                        if (scan.status === 'completed') {
+                            clearInterval(pollInterval);
+                            // Transform to display format
+                            const displayData = {
+                                stats: {
+                                    total: scan.total_links,
+                                    broken: scan.broken_links,
+                                    ok: scan.total_links - scan.broken_links,
+                                    redirects: 0
+                                },
+                                results: scan.results || [],
+                                url: scan.url
+                            };
+                            
+                            if (context === 'dashboard') {
+                                displayDashboardResults(displayData);
+                            } else {
+                                displayResults(displayData);
+                            }
+                            
+                            showAlert('Scan completed successfully!', 'success');
+                        } else if (scan.status === 'failed') {
+                            clearInterval(pollInterval);
+                            showAlert('Scan failed. Please try again.', 'error');
+                            
+                            if (context === 'dashboard') {
+                                document.getElementById('dashboardLoading').style.display = 'none';
+                            } else {
+                                document.getElementById('loading').style.display = 'none';
+                            }
+                        }
+                    }
+                } catch (error) {
+                    clearInterval(pollInterval);
+                    console.error('Poll error:', error);
+                    
+                    if (context === 'dashboard') {
+                        document.getElementById('dashboardLoading').style.display = 'none';
+                    } else {
+                        document.getElementById('loading').style.display = 'none';
+                    }
+                }
+            }, 3000); // Poll every 3 seconds
+        }
+
+        // Display results (public)
+        function displayResults(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results').classList.add('active');
+
+            // Update stats
+            document.getElementById('totalLinks').textContent = data.stats ? data.stats.total : data.total;
+            document.getElementById('brokenLinks').textContent = data.stats ? data.stats.broken : data.broken;
+            document.getElementById('okLinks').textContent = data.stats ? data.stats.ok : data.ok;
+            document.getElementById('redirects').textContent = data.stats ? data.stats.redirects : data.redirects;
+
+            // Update table
+            const tbody = document.getElementById('linksTableBody');
+            tbody.innerHTML = '';
+
+            const links = data.results || data.links || [];
+            
+            if (links.length === 0 && data.stats && data.stats.broken === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #10b981; font-weight: 600;">🎉 No broken links found! Your website is healthy.</td></tr>';
+            } else {
+                links.forEach(link => {
+                    const row = tbody.insertRow();
+                    
+                    const urlCell = row.insertCell(0);
+                    urlCell.innerHTML = `<a href="${link.url}" target="_blank" style="color: #3b82f6; text-decoration: none;">${link.url}</a>`;
+                    
+                    const statusCell = row.insertCell(1);
+                    const status = link.status || link.status_code || 'Error';
+                    let statusClass = 'status-error';
+                    if (status >= 200 && status < 300) statusClass = 'status-ok';
+                    else if (status === 301 || status === 302) statusClass = 'status-redirect';
+                    statusCell.innerHTML = `<span class="status-badge ${statusClass}">${status}</span>`;
+                    
+                    const foundCell = row.insertCell(2);
+                    foundCell.textContent = link.foundOn || link.found_on || data.url || '';
+                });
+            }
+
+            // Show message if limited
+            if (data.message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'alert alert-warning';
+                messageDiv.textContent = data.message;
+                messageDiv.style.marginTop = '1rem';
+                document.getElementById('results').appendChild(messageDiv);
+            }
+        }
+
+        // Display results (dashboard)
+        function displayDashboardResults(data) {
+            document.getElementById('dashboardLoading').style.display = 'none';
+            document.getElementById('dashboardResults').classList.add('active');
+
+            // Update stats
+            document.getElementById('dashboardTotalLinks').textContent = data.stats ? data.stats.total : data.total;
+            document.getElementById('dashboardBrokenLinks').textContent = data.stats ? data.stats.broken : data.broken;
+            document.getElementById('dashboardOkLinks').textContent = data.stats ? data.stats.ok : data.ok;
+            document.getElementById('dashboardRedirects').textContent = data.stats ? data.stats.redirects : data.redirects;
+
+            // Update table
+            const tbody = document.getElementById('dashboardLinksTableBody');
+            tbody.innerHTML = '';
+
+            const links = data.results || data.links || [];
+            
+            if (links.length === 0 && data.stats && data.stats.broken === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #10b981; font-weight: 600;">🎉 No broken links found! Your website is healthy.</td></tr>';
+            } else {
+                links.forEach(link => {
+                    const row = tbody.insertRow();
+                    
+                    const urlCell = row.insertCell(0);
+                    urlCell.innerHTML = `<a href="${link.url}" target="_blank" style="color: #3b82f6; text-decoration: none;">${link.url}</a>`;
+                    
+                    const statusCell = row.insertCell(1);
+                    const status = link.status || link.status_code || 'Error';
+                    let statusClass = 'status-error';
+                    if (status >= 200 && status < 300) statusClass = 'status-ok';
+                    else if (status === 301 || status === 302) statusClass = 'status-redirect';
+                    statusCell.innerHTML = `<span class="status-badge ${statusClass}">${status}</span>`;
+                    
+                    const foundCell = row.insertCell(2);
+                    foundCell.textContent = link.foundOn || link.found_on || data.url || '';
+                });
+            }
+        }
+
+        // Export functions
+        function exportCSV() {
+            if (!authToken) {
+                showAlert('Please login to export results', 'warning');
+                openModal('login');
+                return;
+            }
+            
+            if (currentScanId) {
+                window.location.href = `${API_BASE}/scans/${currentScanId}/export/csv`;
+            } else {
+                showAlert('No scan data to export', 'warning');
+            }
+        }
+
+        function exportPDF() {
+            if (!authToken) {
+                showAlert('Please login to export results', 'warning');
+                openModal('login');
+                return;
+            }
+            showAlert('PDF export coming soon!', 'warning');
+        }
+
+        function exportDashboardCSV() {
+            if (currentScanId) {
+                window.location.href = `${API_BASE}/scans/${currentScanId}/export/csv`;
+            } else {
+                showAlert('No scan data to export', 'warning');
+            }
+        }
+
+        function exportDashboardPDF() {
+            showAlert('PDF export coming soon!', 'warning');
+        }
+
+        // Modal functions
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+            // Clear previous alerts
+            document.getElementById(type + 'Alert').innerHTML = '';
+        }
+
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Handle login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    currentUser = data.user;
+                    
+                    // Store in localStorage
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    updateUIForAuth(true);
+                    closeModal('login');
+                    showAlert('Login successful! Welcome back.', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Login failed', 'error', 'loginAlert');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Network error. Please try again.', 'error', 'loginAlert');
+            }
+        });
+
+        // Handle signup form
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long', 'error', 'signupAlert');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    currentUser = data.user;
+                    
+                    // Store in localStorage
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    updateUIForAuth(true);
+                    closeModal('signup');
+                    showAlert(`Welcome to CheckMyLinks, ${currentUser.name}! Your account has been created.`, 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Registration failed', 'error', 'signupAlert');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAlert('Network error. Please try again.', 'error', 'signupAlert');
+            }
+        });
+
+        // Logout function
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            currentScanId = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            updateUIForAuth(false);
+            showAlert('You have been logged out successfully.', 'success');
+        }
+    </script>
+</body>
+</html>
