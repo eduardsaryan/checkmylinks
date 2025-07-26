@@ -130,6 +130,7 @@ app.post('/api/auth/logout', async (req, res) => {
 });
 
 // Verify email
+// Verify email
 app.get('/api/auth/verify-email', async (req, res) => {
     const { token } = req.query;
     
@@ -138,18 +139,61 @@ app.get('/api/auth/verify-email', async (req, res) => {
     }
     
     const result = await authService.verifyEmail(token);
-    if (result.success) {
-    res.redirect('/?verified=true&message=Your+email+has+been+verified');
-    } else {
-        res.redirect('/?verification_failed=true');
-    }
     
-    // if (result.success) {
-    //     res.redirect('/?verified=true');
-    // } else {
-    //     res.redirect('/?verification_failed=true');
-    // }
+    if (result.success) {
+        // Redirect to a simple HTML page instead
+        res.send(`
+            <html>
+                <head>
+                    <title>Email Verified - CheckMyLinks</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .success { color: #10b981; }
+                        a { color: #2563eb; text-decoration: none; }
+                    </style>
+                </head>
+                <body>
+                    <h1 class="success">✓ Email Verified Successfully!</h1>
+                    <p>Your email has been verified. You can now access all features.</p>
+                    <p><a href="/">Return to CheckMyLinks</a></p>
+                </body>
+            </html>
+        `);
+    } else {
+        res.send(`
+            <html>
+                <head>
+                    <title>Verification Failed - CheckMyLinks</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .error { color: #dc2626; }
+                        a { color: #2563eb; text-decoration: none; }
+                    </style>
+                </head>
+                <body>
+                    <h1 class="error">Verification Failed</h1>
+                    <p>The verification link is invalid or has expired.</p>
+                    <p><a href="/">Return to CheckMyLinks</a></p>
+                </body>
+            </html>
+        `);
+    }
 });
+
+// app.get('/api/auth/verify-email', async (req, res) => {
+//     const { token } = req.query;
+    
+//     if (!token) {
+//         return res.status(400).json({ error: 'Verification token required' });
+//     }
+    
+//     const result = await authService.verifyEmail(token);
+//     if (result.success) {
+//     res.redirect('/?verified=true&message=Your+email+has+been+verified');
+//     } else {
+//         res.redirect('/?verification_failed=true');
+//     }
+// });
 
 // Resend verification email
 app.post('/api/auth/resend-verification', async (req, res) => {
