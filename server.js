@@ -130,7 +130,6 @@ app.post('/api/auth/logout', async (req, res) => {
 });
 
 // Verify email
-// Verify email
 app.get('/api/auth/verify-email', async (req, res) => {
     const { token } = req.query;
     
@@ -140,39 +139,57 @@ app.get('/api/auth/verify-email', async (req, res) => {
     
     const result = await authService.verifyEmail(token);
     
-if (result.success) {
-    const successHTML = `
-        <html>
-            <head>
-                <title>Email Verified - CheckMyLinks</title>
-                <style>
-                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                    .success { color: #10b981; }
-                    .countdown { color: #6b7280; font-size: 0.9em; }
-                </style>
-                <script>
-                    let seconds = 3;
-                    function countdown() {
-                        document.getElementById('countdown').textContent = seconds;
-                        if (seconds === 0) {
-                            window.location.href = '/';
-                        } else {
-                            seconds--;
-                            setTimeout(countdown, 1000);
+    if (result.success) {
+        res.send(`
+            <html>
+                <head>
+                    <title>Email Verified - CheckMyLinks</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .success { color: #10b981; }
+                        .countdown { color: #6b7280; font-size: 0.9em; }
+                    </style>
+                    <script>
+                        let seconds = 3;
+                        function countdown() {
+                            document.getElementById('countdown').textContent = seconds;
+                            if (seconds === 0) {
+                                window.location.href = '/';
+                            } else {
+                                seconds--;
+                                setTimeout(countdown, 1000);
+                            }
                         }
-                    }
-                    window.onload = countdown;
-                </script>
-            </head>
-            <body>
-                <h1 class="success">✓ Email Verified Successfully!</h1>
-                <p>Your email has been verified. You can now access all features.</p>
-                <p class="countdown">Redirecting in <span id="countdown">3</span> seconds...</p>
-            </body>
-        </html>
-    `;
-    res.send(successHTML);
-}
+                        window.onload = countdown;
+                    </script>
+                </head>
+                <body>
+                    <h1 class="success">✓ Email Verified Successfully!</h1>
+                    <p>Your email has been verified. You can now access all features.</p>
+                    <p class="countdown">Redirecting in <span id="countdown">3</span> seconds...</p>
+                </body>
+            </html>
+        `);
+    } else {
+        res.send(`
+            <html>
+                <head>
+                    <title>Verification Failed - CheckMyLinks</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .error { color: #dc2626; }
+                        a { color: #2563eb; text-decoration: none; }
+                    </style>
+                </head>
+                <body>
+                    <h1 class="error">Verification Failed</h1>
+                    <p>The verification link is invalid or has expired.</p>
+                    <p><a href="/">Return to CheckMyLinks</a></p>
+                </body>
+            </html>
+        `);
+    }
+});  
 
 // app.get('/api/auth/verify-email', async (req, res) => {
 //     const { token } = req.query;
