@@ -141,8 +141,7 @@ app.get('/api/auth/verify-email', async (req, res) => {
     const result = await authService.verifyEmail(token);
     
 if (result.success) {
-    // Redirect to a simple HTML page instead
-    res.send(`
+    const successHTML = `
         <html>
             <head>
                 <title>Email Verified - CheckMyLinks</title>
@@ -171,7 +170,8 @@ if (result.success) {
                 <p class="countdown">Redirecting in <span id="countdown">3</span> seconds...</p>
             </body>
         </html>
-    `);
+    `;
+    res.send(successHTML);
 }
 
 // app.get('/api/auth/verify-email', async (req, res) => {
