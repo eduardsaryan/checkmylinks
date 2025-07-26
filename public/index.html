@@ -1029,6 +1029,16 @@
             }
         });
 
+        // Check for verification status in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('verified') === 'true') {
+            showAlert('Email verified successfully! You can now access all features.', 'success');
+            window.history.replaceState({}, document.title, '/');
+        } else if (urlParams.get('verification_failed') === 'true') {
+            showAlert('Email verification failed or link expired. Please request a new verification email.', 'error');
+            window.history.replaceState({}, document.title, '/');
+        }
+
         // Show alert message
         function showAlert(message, type = 'success', elementId = null) {
             const alertClass = `alert alert-${type}`;

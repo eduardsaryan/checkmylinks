@@ -129,6 +129,41 @@ app.post('/api/auth/logout', async (req, res) => {
     res.json({ success: true, message: 'Logged out successfully' });
 });
 
+// Verify email
+app.get('/api/auth/verify-email', async (req, res) => {
+    const { token } = req.query;
+    
+    if (!token) {
+        return res.status(400).json({ error: 'Verification token required' });
+    }
+    
+    const result = await authService.verifyEmail(token);
+    
+    if (result.success) {
+        res.redirect('/?verified=true');
+    } else {
+        res.redirect('/?verification_failed=true');
+    }
+});
+
+// Resend verification email
+app.post('/api/auth/resend-verification', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const authResult = await authService.verifyToken(token);
+    
+    if (!authResult.success) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    const result = await authService.resendVerificationEmail(authResult.user.id);
+    res.json(result);
+});
+
 // Dashboard routes
 app.use('/api', dashboardRoutes);
 
