@@ -1672,6 +1672,7 @@
                     updateUIForAuth(true);
                     closeModal('login');
                     showAlert('Login successful! Welcome back.', 'success');
+                    document.getElementById('loginForm').reset();
                 } else {
                     const error = await response.json();
                     showAlert(error.error || 'Login failed', 'error', 'loginAlert');
@@ -1716,6 +1717,7 @@
                     updateUIForAuth(true);
                     closeModal('signup');
                     showAlert(`Welcome to CheckMyLinks, ${currentUser.name}! Your account has been created.`, 'success');
+                    document.getElementById('signupForm').reset();
                 } else {
                     const error = await response.json();
                     showAlert(error.error || 'Registration failed', 'error', 'signupAlert');
