@@ -22,6 +22,5 @@ jobs:
         script: |
           cd /var/www/checkmylinks
           git pull origin main
-          npm install --production
           systemctl restart checkmylinks.service
           systemctl status checkmylinks.service
