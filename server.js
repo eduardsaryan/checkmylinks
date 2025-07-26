@@ -138,12 +138,17 @@ app.get('/api/auth/verify-email', async (req, res) => {
     }
     
     const result = await authService.verifyEmail(token);
-    
     if (result.success) {
-        res.redirect('/?verified=true');
+    res.redirect('/?verified=true&message=Your+email+has+been+verified');
     } else {
         res.redirect('/?verification_failed=true');
     }
+    
+    // if (result.success) {
+    //     res.redirect('/?verified=true');
+    // } else {
+    //     res.redirect('/?verification_failed=true');
+    // }
 });
 
 // Resend verification email
