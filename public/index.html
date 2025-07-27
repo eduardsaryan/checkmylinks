@@ -621,29 +621,7 @@
             margin-top: 4rem;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .url-input-group {
-                flex-direction: column;
-            }
-            
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                order: 2;
-            }
-            
-            .nav-links {
-                gap: 1rem;
-            }
-        }
-
-        /* Dashboard Enhancement Styles - Add to your existing CSS */
+        /* Dashboard Enhancement Styles */
         .dashboard-stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -890,6 +868,26 @@
         }
 
         @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
             .filters-row {
                 flex-direction: column;
                 align-items: stretch;
@@ -909,7 +907,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
     </style>
 </head>
 <body>
@@ -937,9 +934,7 @@
                 <div class="checker-section">
                     <div class="url-input-group">
                         <input type="url" class="url-input" id="urlInput" placeholder="Enter website URL (e.g., https://example.com)">
-                        <button class="btn" onclick="scanWebsite()">
-                            Scan Website
-                        </button>
+                        <button class="btn" onclick="scanWebsite()">Scan Website</button>
                     </div>
 
                     <div class="loading" id="loading" style="display: none;">
@@ -1115,55 +1110,9 @@
                         <h3 style="margin-bottom: 1rem;">Run New Scan</h3>
                         <div class="url-input-group">
                             <input type="url" class="url-input" id="dashboardUrlInput" placeholder="Enter website URL (e.g., https://example.com)">
-                            <button class="btn" onclick="scanWebsiteDashboard()">
-                                Scan Website
-                            </button>
+                            <button class="btn" onclick="scanWebsiteDashboard()">Scan Website</button>
                         </div>
                     </div>
-
-                    <div class="loading" id="dashboardLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <p>Scanning website for broken links...</p>
-                    </div>
-
-                    <div class="results" id="dashboardResults">
-                        <div class="stats">
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardTotalLinks">0</div>
-                                <div class="stat-label">Total Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardBrokenLinks">0</div>
-                                <div class="stat-label">Broken Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardOkLinks">0</div>
-                                <div class="stat-label">Working Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardRedirects">0</div>
-                                <div class="stat-label">Redirects</div>
-                            </div>
-                        </div>
-
-                        <table class="links-table">
-                            <thead>
-                                <tr>
-                                    <th>URL</th>
-                                    <th>Status</th>
-                                    <th>Found On</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboardLinksTableBody">
-                            </tbody>
-                        </table>
-
-                        <div class="export-buttons">
-                            <button class="btn" onclick="exportDashboardCSV()">Export CSV</button>
-                            <button class="btn btn-secondary" onclick="exportDashboardPDF()">Export PDF</button>
-                        </div>
-                    </div>
-                </div>
 
                     <div class="loading" id="dashboardLoading" style="display: none;">
                         <div class="spinner"></div>
@@ -1216,132 +1165,127 @@
                     </div>
                 </div>
 
-
-            <div id="analyticsTab" style="display: none;">
-                <h2>Dashboard & Scan History</h2>
-                
-                <!-- Statistics Overview -->
-                <div class="dashboard-stats-grid">
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-number" id="totalScansCount">0</div>
-                        <div class="dashboard-stat-label">Total Scans</div>
-                    </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-number" id="monthlyScansCount">0</div>
-                        <div class="dashboard-stat-label">This Month</div>
-                    </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-number" id="totalBrokenFound">0</div>
-                        <div class="dashboard-stat-label">Broken Links Found</div>
-                    </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-number" id="monthlyBrokenFound">0</div>
-                        <div class="dashboard-stat-label">This Month</div>
-                    </div>
-                </div>
-
-                <!-- Filters Section -->
-                <div class="filters-section">
-                    <h3 style="margin-bottom: 1rem;">Filter Scan History</h3>
-                    <div class="filters-row">
-                        <div class="filter-group">
-                            <label for="statusFilter">Status</label>
-                            <select id="statusFilter" class="filter-input">
-                                <option value="">All Statuses</option>
-                                <option value="completed">Completed</option>
-                                <option value="processing">Processing</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="dateFromFilter">From Date</label>
-                            <input type="date" id="dateFromFilter" class="filter-input">
-                        </div>
-                        <div class="filter-group">
-                            <label for="dateToFilter">To Date</label>
-                            <input type="date" id="dateToFilter" class="filter-input">
-                        </div>
-                        <div class="filter-group">
-                            <button class="btn" onclick="applyHistoryFilters()">Apply Filters</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scan History Table -->
-                <div class="history-table-container">
-                    <div class="history-table-header">
-                        <h3>Scan History</h3>
-                        <button class="btn btn-secondary" onclick="loadScanHistory()">Refresh</button>
-                    </div>
+                <div id="analyticsTab" style="display: none;">
+                    <h2>Dashboard & Scan History</h2>
                     
-                    <div id="scanHistoryContent">
-                        <div class="loading-spinner">Loading scan history...</div>
+                    <!-- Statistics Overview -->
+                    <div class="dashboard-stats-grid">
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-number" id="totalScansCount">0</div>
+                            <div class="dashboard-stat-label">Total Scans</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-number" id="monthlyScansCount">0</div>
+                            <div class="dashboard-stat-label">This Month</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-number" id="totalBrokenFound">0</div>
+                            <div class="dashboard-stat-label">Broken Links Found</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-number" id="monthlyBrokenFound">0</div>
+                            <div class="dashboard-stat-label">This Month</div>
+                        </div>
                     </div>
+
+                    <!-- Filters Section -->
+                    <div class="filters-section">
+                        <h3 style="margin-bottom: 1rem;">Filter Scan History</h3>
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label for="statusFilter">Status</label>
+                                <select id="statusFilter" class="filter-input">
+                                    <option value="">All Statuses</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="failed">Failed</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="dateFromFilter">From Date</label>
+                                <input type="date" id="dateFromFilter" class="filter-input">
+                            </div>
+                            <div class="filter-group">
+                                <label for="dateToFilter">To Date</label>
+                                <input type="date" id="dateToFilter" class="filter-input">
+                            </div>
+                            <div class="filter-group">
+                                <button class="btn" onclick="applyHistoryFilters()">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan History Table -->
+                    <div class="history-table-container">
+                        <div class="history-table-header">
+                            <h3>Scan History</h3>
+                            <button class="btn btn-secondary" onclick="loadScanHistory()">Refresh</button>
+                        </div>
+                        
+                        <div id="scanHistoryContent">
+                            <div class="loading-spinner">Loading scan history...</div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="historyPagination" class="pagination-controls" style="display: none;"></div>
                 </div>
 
-                <!-- Pagination -->
-                <div id="historyPagination" class="pagination-controls" style="display: none;"></div>
+                <div id="settingsTab" style="display: none;">
+                    <h2>Account Settings</h2>
+                    
+                    <!-- Profile Settings -->
+                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">Profile Information</h3>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="userEmail" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="userNameInput">
+                        </div>
+                        <button class="btn" onclick="updateProfile()">Update Profile</button>
+                    </div>
 
-                <!-- Email Notifications Settings -->
-                <div class="feature-card" style="text-align: left; margin-top: 2rem;">
-                    <h3>📧 Email Notifications</h3>
-                    <p>Get notified when scans complete or broken links are found</p>
-                    <div style="margin-top: 1rem;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="emailNotifications" checked> 
-                            Enable email notifications
-                        </label>
+                    <!-- Subscription Settings -->
+                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">Subscription</h3>
+                        <div class="form-group">
+                            <label>Current Plan</label>
+                            <input type="text" id="userPlan" readonly>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button class="btn" onclick="upgradePlan()">Upgrade Plan</button>
+                            <button class="btn btn-secondary" onclick="viewBilling()">View Billing</button>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Scan Details Modal - Add this before the closing </main> tag -->
-            <div id="scanDetailsModal" class="scan-details-modal" style="display: none;">
-                <div class="scan-details-content">
-                    <div class="scan-details-header">
-                        <h3>Scan Details</h3>
-                        <button class="close-btn" onclick="closeScanDetailsModal()">&times;</button>
-                    </div>
-                    <div class="scan-details-body" id="scanDetailsBody">
-                        <!-- Content will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-                                
-                    <div class="feature-card" style="text-align: left; margin-bottom: 2rem;">
-                        <h3>📧 Email Notifications</h3>
-                        <p>Get notified when scans complete or broken links are found</p>
+                    <!-- Notification Settings -->
+                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">📧 Email Notifications</h3>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">Get notified when scans complete or broken links are found</p>
                         <div style="margin-top: 1rem;">
                             <label style="display: flex; align-items: center; gap: 0.5rem;">
                                 <input type="checkbox" id="emailNotifications" checked> 
                                 Enable email notifications
                             </label>
                         </div>
+                        <button class="btn" onclick="updateNotificationSettings()" style="margin-top: 1rem;">Save Settings</button>
                     </div>
 
-                    <div class="feature-card" style="text-align: left;">
-                        <h3>⏰ Scheduled Scans (Coming Soon)</h3>
-                        <p>Set up automated scans to run daily, weekly, or monthly</p>
-                        <button class="btn btn-secondary" disabled style="margin-top: 1rem;">Available in Pro Plan</button>
+                    <!-- Scheduled Scans -->
+                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">⏰ Scheduled Scans</h3>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">Set up automated scans to run daily, weekly, or monthly</p>
+                        <button class="btn" onclick="setupScheduledScans()" id="scheduledScansBtn">Set Up Scheduled Scans</button>
                     </div>
-                </div>
 
-                <div id="settingsTab" style="display: none;">
-                    <h2>Account Settings</h2>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="userEmail" readonly>
+                    <!-- Account Actions -->
+                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1rem;">Account Actions</h3>
+                        <button class="btn btn-danger" onclick="logout()">Logout</button>
                     </div>
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" id="userNameInput">
-                    </div>
-                    <div class="form-group">
-                        <label>Current Plan</label>
-                        <input type="text" id="userPlan" readonly>
-                    </div>
-                    <button class="btn" onclick="updateProfile()">Update Profile</button>
-                    <button class="btn btn-danger" onclick="logout()" style="margin-left: 1rem;">Logout</button>
                 </div>
             </div>
         </div>
@@ -1406,12 +1350,22 @@
         </div>
     </div>
 
+    <!-- Scan Details Modal -->
+    <div id="scanDetailsModal" class="scan-details-modal" style="display: none;">
+        <div class="scan-details-content">
+            <div class="scan-details-header">
+                <h3>Scan Details</h3>
+                <button class="close-btn" onclick="closeScanDetailsModal()">&times;</button>
+            </div>
+            <div class="scan-details-body" id="scanDetailsBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Configuration
         const API_BASE = '/api';
-
-
-        // Dashboard Enhancement Functions - Add these to your existing script section
 
         // Global variables for scan history
         let currentHistoryPage = 1;
@@ -1419,10 +1373,197 @@
         const historyPageSize = 15;
         let currentHistoryFilters = {};
 
-        // Enhanced loadUserAnalytics function - Replace your existing one
+        // Auth state
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        let currentScanId = null;
+
+        // Check if user is logged in on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (authToken) {
+                checkAuthStatus();
+            }
+        });
+
+        // Check for verification status in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('verified') === 'true') {
+            showAlert('Email verified successfully! You can now access all features.', 'success');
+            window.history.replaceState({}, document.title, '/');
+        } else if (urlParams.get('verification_failed') === 'true') {
+            showAlert('Email verification failed or link expired. Please request a new verification email.', 'error');
+            window.history.replaceState({}, document.title, '/');
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'success', elementId = null) {
+            const alertClass = `alert alert-${type}`;
+            const alertHTML = `<div class="${alertClass}">${message}</div>`;
+            
+            if (elementId) {
+                document.getElementById(elementId).innerHTML = alertHTML;
+                setTimeout(() => {
+                    document.getElementById(elementId).innerHTML = '';
+                }, 5000);
+            } else {
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = alertClass;
+                alertDiv.textContent = message;
+                alertDiv.style.position = 'fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.minWidth = '300px';
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Check auth status
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/scans`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    updateUIForAuth(true);
+                    loadDashboardData();
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                logout();
+            }
+        }
+
+        // Update UI based on auth status
+        function updateUIForAuth(isLoggedIn) {
+            const navLinks = document.getElementById('navLinks');
+            const homepage = document.getElementById('homepage');
+            const dashboard = document.getElementById('dashboardSection');
+            const featuresPage = document.getElementById('featuresPage');
+            
+            if (isLoggedIn && currentUser) {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showHomepage()">Home</a>
+                    <a href="#" onclick="showDashboard()">Dashboard</a>
+                    <span style="color: #6b7280;">Welcome, ${currentUser.name}!</span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                `;
+                homepage.style.display = 'none';
+                featuresPage.style.display = 'none';
+                dashboard.classList.add('active');
+            } else {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showFeaturesPage()">Features</a>
+                    <a href="#" onclick="goHome(); scrollToPricing()">Pricing</a>
+                    <a href="#" onclick="openModal('login')">Login</a>
+                    <a href="#" class="btn" onclick="openModal('signup')">Sign Up Free</a>
+                `;
+                homepage.style.display = 'block';
+                featuresPage.style.display = 'none';
+                dashboard.classList.remove('active');
+            }
+        }
+
+        // Navigation functions
+        function goHome() {
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+        }
+
+        function scrollToPricing() {
+            setTimeout(() => {
+                const pricingSection = document.getElementById('pricing');
+                if (pricingSection) {
+                    pricingSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        }
+
+        function showFeaturesPage() {
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('featuresPage').style.display = 'block';
+        }
+
+        function showHomepage() {
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('featuresPage').style.display = 'none';
+            document.getElementById('dashboardSection').classList.add('active');
+            loadDashboardData();
+        }
+
+        // Show dashboard tab
+        function showDashboardTab(tab) {
+            document.getElementById('overviewTab').style.display = 'none';
+            document.getElementById('scansTab').style.display = 'none';
+            document.getElementById('analyticsTab').style.display = 'none';
+            document.getElementById('settingsTab').style.display = 'none';
+            
+            document.getElementById(tab + 'Tab').style.display = 'block';
+            
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (tab === 'scans') {
+                loadUserScans();
+            } else if (tab === 'settings') {
+                loadUserSettings();
+            } else if (tab === 'analytics') {
+                loadUserAnalytics();
+            }
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                loadUserSettings();
+            }
+        }
+
+        // Load user settings and update sidebar
+        function loadUserSettings() {
+            if (currentUser) {
+                document.getElementById('userEmail').value = currentUser.email;
+                document.getElementById('userNameInput').value = currentUser.name;
+                document.getElementById('userPlan').value = currentUser.plan || 'Free Plan';
+                
+                // Update sidebar subscription info
+                document.getElementById('sidebarPlan').textContent = currentUser.plan || 'Free Plan';
+                
+                const scansRemaining = (currentUser.plan_limit || 5) - (currentUser.scans_this_month || 0);
+                document.getElementById('sidebarScansRemaining').textContent = `${scansRemaining} scans remaining`;
+            }
+        }
+
+        // Enhanced loadUserAnalytics function
         async function loadUserAnalytics() {
             try {
-                // Load dashboard statistics
                 const statsResponse = await fetch(`${API_BASE}/scans/stats`, {
                     headers: {
                         'Authorization': `Bearer ${authToken}`
@@ -1437,7 +1578,6 @@
                     document.getElementById('monthlyBrokenFound').textContent = stats.monthlyBrokenLinks || 0;
                 }
                 
-                // Load scan history
                 loadScanHistory();
                 setupHistoryFilterListeners();
             } catch (error) {
@@ -1553,13 +1693,11 @@
             
             let paginationHTML = '';
             
-            // Previous button
             paginationHTML += `
                 <button class="page-btn" ${currentHistoryPage === 1 ? 'disabled' : ''} 
                         onclick="loadScanHistory(${currentHistoryPage - 1})">Previous</button>
             `;
             
-            // Page numbers
             const startPage = Math.max(1, currentHistoryPage - 2);
             const endPage = Math.min(totalHistoryPages, currentHistoryPage + 2);
             
@@ -1584,7 +1722,6 @@
                 paginationHTML += `<button class="page-btn" onclick="loadScanHistory(${totalHistoryPages})">${totalHistoryPages}</button>`;
             }
             
-            // Next button
             paginationHTML += `
                 <button class="page-btn" ${currentHistoryPage === totalHistoryPages ? 'disabled' : ''} 
                         onclick="loadScanHistory(${currentHistoryPage + 1})">Next</button>
@@ -1616,7 +1753,7 @@
             if (dateFrom) currentHistoryFilters.dateFrom = dateFrom;
             if (dateTo) currentHistoryFilters.dateTo = dateTo;
             
-            loadScanHistory(1); // Reset to first page when applying filters
+            loadScanHistory(1);
         }
 
         // View scan details from history
@@ -1694,230 +1831,61 @@
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Helper function to get auth headers - Make sure this exists in your code
-        function getAuthHeaders() {
-            return {
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            };
-        }
-
-
-        // Auth state
-        let authToken = localStorage.getItem('authToken');
-        let currentUser = null;
-        let currentScanId = null;
-
-        // Check if user is logged in on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            if (authToken) {
-                checkAuthStatus();
-            }
-        });
-
-        // Check for verification status in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('verified') === 'true') {
-            showAlert('Email verified successfully! You can now access all features.', 'success');
-            window.history.replaceState({}, document.title, '/');
-        } else if (urlParams.get('verification_failed') === 'true') {
-            showAlert('Email verification failed or link expired. Please request a new verification email.', 'error');
-            window.history.replaceState({}, document.title, '/');
-        }
-
-        // Show alert message
-        function showAlert(message, type = 'success', elementId = null) {
-            const alertClass = `alert alert-${type}`;
-            const alertHTML = `<div class="${alertClass}">${message}</div>`;
-            
-            if (elementId) {
-                document.getElementById(elementId).innerHTML = alertHTML;
-                setTimeout(() => {
-                    document.getElementById(elementId).innerHTML = '';
-                }, 5000);
+        // Setup scheduled scans
+        function setupScheduledScans() {
+            if (!currentUser || currentUser.plan === 'free' || !currentUser.plan || currentUser.plan === 'Free Plan') {
+                showUpgradeModal('Scheduled Scans', 'Set up automated daily, weekly, or monthly scans to monitor your websites continuously.');
             } else {
-                // Show global alert
-                const existingAlert = document.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
-                
-                const alertDiv = document.createElement('div');
-                alertDiv.className = alertClass;
-                alertDiv.textContent = message;
-                alertDiv.style.position = 'fixed';
-                alertDiv.style.top = '20px';
-                alertDiv.style.right = '20px';
-                alertDiv.style.zIndex = '9999';
-                alertDiv.style.minWidth = '300px';
-                
-                document.body.appendChild(alertDiv);
-                
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 5000);
+                showAlert('Scheduled scans configuration coming soon!', 'info');
             }
         }
 
-        // Check auth status
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch(`${API_BASE}/scans`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
-                
-                if (response.ok) {
-                    currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                    updateUIForAuth(true);
-                    loadDashboardData();
-                } else {
-                    logout();
-                }
-            } catch (error) {
-                console.error('Auth check failed:', error);
-                logout();
-            }
+        // Show upgrade modal
+        function showUpgradeModal(feature, description) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Upgrade to Pro Plan</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <div style="padding: 1rem 0;">
+                        <h3 style="margin-bottom: 1rem;">${feature}</h3>
+                        <p style="margin-bottom: 1.5rem; color: #6b7280;">${description}</p>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.5rem;">Pro Plan includes:</h4>
+                            <ul style="margin-left: 1rem; color: #4b5563;">
+                                <li>Unlimited scans</li>
+                                <li>Scheduled automated scans</li>
+                                <li>Advanced reports</li>
+                                <li>Priority support</li>
+                            </ul>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn" onclick="upgradePlan()">Upgrade Now</button>
+                            <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Maybe Later</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
-        // Update UI based on auth status - FIXED VERSION
-        function updateUIForAuth(isLoggedIn) {
-            const navLinks = document.getElementById('navLinks');
-            const homepage = document.getElementById('homepage');
-            const dashboard = document.getElementById('dashboardSection');
-            const featuresPage = document.getElementById('featuresPage');
-            
-            if (isLoggedIn && currentUser) {
-                navLinks.innerHTML = `
-                    <a href="#" onclick="showHomepage()">Home</a>
-                    <a href="#" onclick="showFeaturesPage()">Features</a>
-                    <a href="#" onclick="showDashboard()">Dashboard</a>
-                    <span style="color: #6b7280;">Welcome, ${currentUser.name}!</span>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
-                `;
-                homepage.style.display = 'none';
-                featuresPage.style.display = 'none';
-                dashboard.classList.add('active');
-            } else {
-                navLinks.innerHTML = `
-                    <a href="#" onclick="showFeaturesPage()">Features</a>
-                    <a href="#" onclick="goHome(); scrollToPricing()">Pricing</a>
-                    <a href="#" onclick="openModal('login')">Login</a>
-                    <a href="#" class="btn" onclick="openModal('signup')">Sign Up Free</a>
-                `;
-                homepage.style.display = 'block';
-                featuresPage.style.display = 'none';
-                dashboard.classList.remove('active');
-            }
+        // Upgrade plan function
+        function upgradePlan() {
+            showAlert('Upgrade functionality coming soon!', 'info');
         }
 
-        // Go home function
-        function goHome() {
-            document.getElementById('homepage').style.display = 'block';
-            document.getElementById('featuresPage').style.display = 'none';
-            document.getElementById('dashboardSection').classList.remove('active');
+        // Update notification settings
+        function updateNotificationSettings() {
+            const enabled = document.getElementById('emailNotifications').checked;
+            showAlert('Notification settings updated!', 'success');
         }
 
-        // Scroll to pricing section
-        function scrollToPricing() {
-            setTimeout(() => {
-                const pricingSection = document.getElementById('pricing');
-                if (pricingSection) {
-                    pricingSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 100);
-        }
-
-        // Show features page - FIXED VERSION
-        function showFeaturesPage() {
-            console.log('showFeaturesPage called'); // Debug log
-            
-            // Hide all other sections
-            document.getElementById('homepage').style.display = 'none';
-            document.getElementById('dashboardSection').classList.remove('active');
-            
-            // Show features page
-            document.getElementById('featuresPage').style.display = 'block';
-        }
-
-        // Show homepage
-        function showHomepage() {
-            document.getElementById('homepage').style.display = 'block';
-            document.getElementById('featuresPage').style.display = 'none';
-            document.getElementById('dashboardSection').classList.remove('active');
-        }
-
-        // Show dashboard
-        function showDashboard() {
-            document.getElementById('homepage').style.display = 'none';
-            document.getElementById('featuresPage').style.display = 'none';
-            document.getElementById('dashboardSection').classList.add('active');
-            loadDashboardData();
-        }
-
-        // Show dashboard tab
-        function showDashboardTab(tab) {
-            // Hide all tabs
-            document.getElementById('overviewTab').style.display = 'none';
-            document.getElementById('scansTab').style.display = 'none';
-            document.getElementById('analyticsTab').style.display = 'none';
-            document.getElementById('settingsTab').style.display = 'none';
-            
-            // Show selected tab
-            document.getElementById(tab + 'Tab').style.display = 'block';
-            
-            // Update sidebar active state
-            document.querySelectorAll('.sidebar a').forEach(link => {
-                link.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Load tab-specific data
-            if (tab === 'scans') {
-                loadUserScans();
-            } else if (tab === 'settings') {
-                loadUserSettings();
-            } else if (tab === 'analytics') {
-                loadUserAnalytics();
-            }
-        }
-
-        // Load dashboard data
-        function loadDashboardData() {
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.name;
-            }
-        }
-
-        // Load user analytics
-        async function loadUserAnalytics() {
-            try {
-                const response = await fetch(`${API_BASE}/user/stats`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const stats = await response.json();
-                    document.getElementById('totalScansCount').textContent = stats.total_scans || 0;
-                    document.getElementById('totalLinksChecked').textContent = stats.total_links_checked || 0;
-                    document.getElementById('totalBrokenFound').textContent = stats.total_broken_links || 0;
-                    document.getElementById('monthlyScansCount').textContent = stats.monthly_scans || 0;
-                }
-            } catch (error) {
-                console.error('Error loading analytics:', error);
-            }
-        }
-
-        // Load user settings
-        function loadUserSettings() {
-            if (currentUser) {
-                document.getElementById('userEmail').value = currentUser.email;
-                document.getElementById('userNameInput').value = currentUser.name;
-                document.getElementById('userPlan').value = currentUser.plan || 'free';
-            }
+        // View billing
+        function viewBilling() {
+            showAlert('Billing portal coming soon!', 'info');
         }
 
         // Load user scans
@@ -1985,10 +1953,8 @@
                 
                 if (response.ok) {
                     const scan = await response.json();
-                    // Switch to overview tab and display results
                     showDashboardTab('overview');
                     
-                    // Display results in dashboard
                     const displayData = {
                         stats: {
                             total: scan.total_links,
@@ -2048,7 +2014,6 @@
                 return;
             }
 
-            // Validate URL
             try {
                 new URL(url);
             } catch (e) {
@@ -2056,7 +2021,6 @@
                 return;
             }
 
-            // Show loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').classList.remove('active');
 
@@ -2092,7 +2056,6 @@
                 return;
             }
 
-            // Validate URL
             try {
                 new URL(url);
             } catch (e) {
@@ -2100,7 +2063,6 @@
                 return;
             }
 
-            // Show loading
             document.getElementById('dashboardLoading').style.display = 'block';
             document.getElementById('dashboardResults').classList.remove('active');
 
@@ -2117,7 +2079,6 @@
                 if (response.ok) {
                     const scan = await response.json();
                     currentScanId = scan.id;
-                    // Poll for results
                     pollScanStatus(scan.id, 'dashboard');
                 } else {
                     const error = await response.json();
@@ -2146,7 +2107,6 @@
                         
                         if (scan.status === 'completed') {
                             clearInterval(pollInterval);
-                            // Transform to display format
                             const displayData = {
                                 stats: {
                                     total: scan.total_links,
@@ -2186,7 +2146,7 @@
                         document.getElementById('loading').style.display = 'none';
                     }
                 }
-            }, 3000); // Poll every 3 seconds
+            }, 3000);
         }
 
         // Display results (public)
@@ -2194,13 +2154,11 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('results').classList.add('active');
 
-            // Update stats
             document.getElementById('totalLinks').textContent = data.stats ? data.stats.total : data.total;
             document.getElementById('brokenLinks').textContent = data.stats ? data.stats.broken : data.broken;
             document.getElementById('okLinks').textContent = data.stats ? data.stats.ok : data.ok;
             document.getElementById('redirects').textContent = data.stats ? data.stats.redirects : data.redirects;
 
-            // Update table
             const tbody = document.getElementById('linksTableBody');
             tbody.innerHTML = '';
 
@@ -2227,7 +2185,6 @@
                 });
             }
 
-            // Show message if limited
             if (data.message) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'alert alert-warning';
@@ -2242,13 +2199,11 @@
             document.getElementById('dashboardLoading').style.display = 'none';
             document.getElementById('dashboardResults').classList.add('active');
 
-            // Update stats
             document.getElementById('dashboardTotalLinks').textContent = data.stats ? data.stats.total : data.total;
             document.getElementById('dashboardBrokenLinks').textContent = data.stats ? data.stats.broken : data.broken;
             document.getElementById('dashboardOkLinks').textContent = data.stats ? data.stats.ok : data.ok;
             document.getElementById('dashboardRedirects').textContent = data.stats ? data.stats.redirects : data.redirects;
 
-            // Update table
             const tbody = document.getElementById('dashboardLinksTableBody');
             tbody.innerHTML = '';
 
@@ -2315,7 +2270,6 @@
         // Modal functions
         function openModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
-            // Clear previous alerts
             document.getElementById(type + 'Alert').innerHTML = '';
         }
 
@@ -2351,7 +2305,6 @@
                     authToken = data.token;
                     currentUser = data.user;
                     
-                    // Store in localStorage
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     
@@ -2393,16 +2346,8 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    authToken = data.token;
-                    currentUser = data.user;
-                    
-                    // Store in localStorage
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    updateUIForAuth(true);
                     closeModal('signup');
-                    showAlert(`Welcome to CheckMyLinks, ${currentUser.name}! Your account has been created.`, 'success');
+                    showAlert(data.message || 'Registration successful! Please check your email to verify your account.', 'success');
                     document.getElementById('signupForm').reset();
                 } else {
                     const error = await response.json();
@@ -2424,6 +2369,14 @@
             updateUIForAuth(false);
             showAlert('You have been logged out successfully.', 'success');
         }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('scanDetailsModal');
+            if (event.target === modal) {
+                closeScanDetailsModal();
+            }
+        });
     </script>
 </body>
 </html>
