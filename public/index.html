@@ -1081,214 +1081,334 @@
             </section>
         </div>
 
-        <!-- User Dashboard -->
-        <div id="dashboardSection" class="container dashboard">
-            <div class="sidebar">
-                <h3>Dashboard</h3>
-                <ul>
-                    <li><a href="#" class="active" onclick="showDashboardTab('overview')">Overview</a></li>
-                    <li><a href="#" onclick="showDashboardTab('scans')">Recent Scans</a></li>
-                    <li><a href="#" onclick="showDashboardTab('analytics')">Analytics</a></li>
-                    <li><a href="#" onclick="showDashboardTab('settings')">Settings</a></li>
-                </ul>
-                
-                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                    <h4 style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">Account</h4>
-                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
-                        <div style="font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem;">Current Plan</div>
-                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;" id="sidebarPlan">Free Plan</div>
-                        <div style="font-size: 0.8rem; color: #6b7280;" id="sidebarScansRemaining">Loading...</div>
-                    </div>
-                </div>
+<!-- Replace the entire User Dashboard section in your index.html -->
+
+<!-- User Dashboard -->
+<div id="dashboardSection" class="container dashboard">
+    <div class="main-dashboard">
+        <!-- Dashboard Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="margin-bottom: 0.5rem;">Welcome back, <span id="userName"></span>!</h1>
+                <p style="color: #6b7280;">Monitor your website's health with our link checking tools.</p>
             </div>
-            <div class="main-content">
-                <div id="overviewTab">
-                    <h2>Welcome back, <span id="userName"></span>!</h2>
-                    <p>Monitor your website's health with our link checking tools.</p>
-                    
-                    <div class="checker-section" style="margin-top: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">Run New Scan</h3>
-                        <div class="url-input-group">
-                            <input type="url" class="url-input" id="dashboardUrlInput" placeholder="Enter website URL (e.g., https://example.com)">
-                            <button class="btn" onclick="scanWebsiteDashboard()">Scan Website</button>
-                        </div>
-                    </div>
-
-                    <div class="loading" id="dashboardLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <p>Scanning website for broken links...</p>
-                    </div>
-
-                    <div class="results" id="dashboardResults">
-                        <div class="stats">
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardTotalLinks">0</div>
-                                <div class="stat-label">Total Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardBrokenLinks">0</div>
-                                <div class="stat-label">Broken Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardOkLinks">0</div>
-                                <div class="stat-label">Working Links</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="dashboardRedirects">0</div>
-                                <div class="stat-label">Redirects</div>
-                            </div>
-                        </div>
-
-                        <table class="links-table">
-                            <thead>
-                                <tr>
-                                    <th>URL</th>
-                                    <th>Status</th>
-                                    <th>Found On</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboardLinksTableBody">
-                            </tbody>
-                        </table>
-
-                        <div class="export-buttons">
-                            <button class="btn" onclick="exportDashboardCSV()">Export CSV</button>
-                            <button class="btn btn-secondary" onclick="exportDashboardPDF()">Export PDF</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="scansTab" style="display: none;">
-                    <h2>Recent Scans</h2>
-                    <div id="scansList">
-                        <p>Loading scans...</p>
-                    </div>
-                </div>
-
-                <div id="analyticsTab" style="display: none;">
-                    <h2>Dashboard & Scan History</h2>
-                    
-                    <!-- Statistics Overview -->
-                    <div class="dashboard-stats-grid">
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-number" id="totalScansCount">0</div>
-                            <div class="dashboard-stat-label">Total Scans</div>
-                        </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-number" id="monthlyScansCount">0</div>
-                            <div class="dashboard-stat-label">This Month</div>
-                        </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-number" id="totalBrokenFound">0</div>
-                            <div class="dashboard-stat-label">Broken Links Found</div>
-                        </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-number" id="monthlyBrokenFound">0</div>
-                            <div class="dashboard-stat-label">This Month</div>
-                        </div>
-                    </div>
-
-                    <!-- Filters Section -->
-                    <div class="filters-section">
-                        <h3 style="margin-bottom: 1rem;">Filter Scan History</h3>
-                        <div class="filters-row">
-                            <div class="filter-group">
-                                <label for="statusFilter">Status</label>
-                                <select id="statusFilter" class="filter-input">
-                                    <option value="">All Statuses</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="processing">Processing</option>
-                                    <option value="failed">Failed</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="dateFromFilter">From Date</label>
-                                <input type="date" id="dateFromFilter" class="filter-input">
-                            </div>
-                            <div class="filter-group">
-                                <label for="dateToFilter">To Date</label>
-                                <input type="date" id="dateToFilter" class="filter-input">
-                            </div>
-                            <div class="filter-group">
-                                <button class="btn" onclick="applyHistoryFilters()">Apply Filters</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Scan History Table -->
-                    <div class="history-table-container">
-                        <div class="history-table-header">
-                            <h3>Scan History</h3>
-                            <button class="btn btn-secondary" onclick="loadScanHistory()">Refresh</button>
-                        </div>
-                        
-                        <div id="scanHistoryContent">
-                            <div class="loading-spinner">Loading scan history...</div>
-                        </div>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div id="historyPagination" class="pagination-controls" style="display: none;"></div>
-                </div>
-
-                <div id="settingsTab" style="display: none;">
-                    <h2>Account Settings</h2>
-                    
-                    <!-- Profile Settings -->
-                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">Profile Information</h3>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="userEmail" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" id="userNameInput">
-                        </div>
-                        <button class="btn" onclick="updateProfile()">Update Profile</button>
-                    </div>
-
-                    <!-- Subscription Settings -->
-                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">Subscription</h3>
-                        <div class="form-group">
-                            <label>Current Plan</label>
-                            <input type="text" id="userPlan" readonly>
-                        </div>
-                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                            <button class="btn" onclick="upgradePlan()">Upgrade Plan</button>
-                            <button class="btn btn-secondary" onclick="viewBilling()">View Billing</button>
-                        </div>
-                    </div>
-
-                    <!-- Notification Settings -->
-                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">📧 Email Notifications</h3>
-                        <p style="color: #6b7280; margin-bottom: 1rem;">Get notified when scans complete or broken links are found</p>
-                        <div style="margin-top: 1rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                <input type="checkbox" id="emailNotifications" checked> 
-                                Enable email notifications
-                            </label>
-                        </div>
-                        <button class="btn" onclick="updateNotificationSettings()" style="margin-top: 1rem;">Save Settings</button>
-                    </div>
-
-                    <!-- Scheduled Scans -->
-                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">⏰ Scheduled Scans</h3>
-                        <p style="color: #6b7280; margin-bottom: 1rem;">Set up automated scans to run daily, weekly, or monthly</p>
-                        <button class="btn" onclick="setupScheduledScans()" id="scheduledScansBtn">Set Up Scheduled Scans</button>
-                    </div>
-
-                    <!-- Account Actions -->
-                    <div style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <h3 style="margin-bottom: 1rem;">Account Actions</h3>
-                        <button class="btn btn-danger" onclick="logout()">Logout</button>
-                    </div>
+            <div style="text-align: right;">
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 0.85rem; color: #374151; margin-bottom: 0.25rem;">Current Plan</div>
+                    <div style="font-weight: 600; color: #1f2937;" id="dashboardPlan">Free Plan</div>
+                    <div style="font-size: 0.8rem; color: #6b7280;" id="dashboardScansRemaining">Loading...</div>
                 </div>
             </div>
         </div>
+
+        <!-- Quick Stats -->
+        <div class="dashboard-stats-grid" style="margin-bottom: 3rem;">
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="quickTotalScans">0</div>
+                <div class="dashboard-stat-label">Total Scans</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="quickMonthlyScans">0</div>
+                <div class="dashboard-stat-label">This Month</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="quickBrokenFound">0</div>
+                <div class="dashboard-stat-label">Broken Links Found</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="quickLastScan">-</div>
+                <div class="dashboard-stat-label">Last Scan</div>
+            </div>
+        </div>
+
+        <!-- Main Scanning Area -->
+        <div class="checker-section" style="margin-bottom: 3rem;">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Scan Your Website</h2>
+            <div class="url-input-group">
+                <input type="url" class="url-input" id="dashboardUrlInput" placeholder="Enter website URL (e.g., https://example.com)" style="font-size: 1.1rem; padding: 1.25rem;">
+                <button class="btn" onclick="scanWebsiteDashboard()" style="font-size: 1.1rem; padding: 1.25rem 2rem;">Scan Website</button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="dashboardLoading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Scanning website for broken links...</p>
+        </div>
+
+        <!-- Scan Results -->
+        <div class="results" id="dashboardResults" style="margin-bottom: 3rem;">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="dashboardTotalLinks">0</div>
+                    <div class="stat-label">Total Links</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="dashboardBrokenLinks">0</div>
+                    <div class="stat-label">Broken Links</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="dashboardOkLinks">0</div>
+                    <div class="stat-label">Working Links</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="dashboardRedirects">0</div>
+                    <div class="stat-label">Redirects</div>
+                </div>
+            </div>
+
+            <table class="links-table">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Status</th>
+                        <th>Found On</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardLinksTableBody">
+                </tbody>
+            </table>
+
+            <div class="export-buttons">
+                <button class="btn" onclick="exportDashboardCSV()">Export CSV</button>
+                <button class="btn btn-secondary" onclick="exportDashboardPDF()">Export PDF</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Sections -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+            <!-- Recent Scans -->
+            <div style="background: #ffffff; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Recent Scans</h3>
+                    <button class="btn btn-secondary" onclick="showAnalytics()">View All</button>
+                </div>
+                <div id="recentScansList">
+                    <p style="color: #6b7280;">Loading recent scans...</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="background: #ffffff; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin-bottom: 1.5rem;">Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn" onclick="showAnalytics()" style="justify-content: flex-start;">
+                        📊 View Analytics
+                    </button>
+                    <button class="btn btn-secondary" onclick="setupScheduledScans()" style="justify-content: flex-start;">
+                        ⏰ Schedule Scans
+                    </button>
+                    <button class="btn btn-secondary" onclick="showReports()" style="justify-content: flex-start;">
+                        📈 View Reports
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Page (hidden by default) -->
+    <div id="analyticsPage" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Analytics & Scan History</h1>
+            <button class="btn btn-secondary" onclick="showMainDashboard()">← Back to Dashboard</button>
+        </div>
+        
+        <!-- Statistics Overview -->
+        <div class="dashboard-stats-grid">
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="totalScansCount">0</div>
+                <div class="dashboard-stat-label">Total Scans</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="monthlyScansCount">0</div>
+                <div class="dashboard-stat-label">This Month</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="totalBrokenFound">0</div>
+                <div class="dashboard-stat-label">Broken Links Found</div>
+            </div>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-number" id="monthlyBrokenFound">0</div>
+                <div class="dashboard-stat-label">This Month</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <h3 style="margin-bottom: 1rem;">Filter Scan History</h3>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter" class="filter-input">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="processing">Processing</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dateFromFilter">From Date</label>
+                    <input type="date" id="dateFromFilter" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="dateToFilter">To Date</label>
+                    <input type="date" id="dateToFilter" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <button class="btn" onclick="applyHistoryFilters()">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan History Table -->
+        <div class="history-table-container">
+            <div class="history-table-header">
+                <h3>Scan History</h3>
+                <button class="btn btn-secondary" onclick="loadScanHistory()">Refresh</button>
+            </div>
+            
+            <div id="scanHistoryContent">
+                <div class="loading-spinner">Loading scan history...</div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="historyPagination" class="pagination-controls" style="display: none;"></div>
+    </div>
+</div>
+
+<!-- Settings Dropdown (add this right after the nav) -->
+<div id="settingsDropdown" class="settings-dropdown" style="display: none;">
+    <div class="settings-menu">
+        <div class="settings-header">
+            <h3>Account Settings</h3>
+        </div>
+        <div class="settings-content">
+            <!-- Profile Settings -->
+            <div class="settings-section">
+                <h4>Profile Information</h4>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="userEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="userNameInput">
+                </div>
+                <button class="btn" onclick="updateProfile()">Update Profile</button>
+            </div>
+
+            <!-- Subscription Settings -->
+            <div class="settings-section">
+                <h4>Subscription</h4>
+                <div class="form-group">
+                    <label>Current Plan</label>
+                    <input type="text" id="userPlan" readonly>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn" onclick="upgradePlan()">Upgrade Plan</button>
+                    <button class="btn btn-secondary" onclick="viewBilling()">View Billing</button>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <h4>📧 Email Notifications</h4>
+                <p style="color: #6b7280; margin-bottom: 1rem;">Get notified when scans complete or broken links are found</p>
+                <div style="margin-top: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="emailNotifications" checked> 
+                        Enable email notifications
+                    </label>
+                </div>
+                <button class="btn" onclick="updateNotificationSettings()" style="margin-top: 1rem;">Save Settings</button>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="settings-section">
+                <h4>Account Actions</h4>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this CSS to your existing styles -->
+<style>
+.main-dashboard {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.settings-dropdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-menu {
+    background: #ffffff;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.settings-header {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+}
+
+.settings-header h3 {
+    margin: 0;
+}
+
+.settings-content {
+    padding: 1.5rem;
+}
+
+.settings-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.settings-section h4 {
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.dashboard.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .main-dashboard {
+        padding: 1rem;
+    }
+    
+    .settings-menu {
+        width: 95%;
+    }
+}
+</style>
     </main>
 
     <footer>
