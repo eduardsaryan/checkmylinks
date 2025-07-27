@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Export a function that accepts dependencies
-module.exports = (pool, queue, authService, emailService) => {
+module.exports = (pool, queue, authService) => {
    // Middleware to verify authentication
    const authenticateUser = async (req, res, next) => {
        const token = req.headers.authorization?.split(' ')[1];
@@ -112,14 +112,26 @@ module.exports = (pool, queue, authService, emailService) => {
            return res.status(400).json({ error: 'Invalid URL' });
        }
        
-       // Check scan limit
-       if (req.user.scansThisMonth >= req.user.planLimit) {
-           return res.status(403).json({ 
-               error: 'Monthly scan limit reached. Please upgrade your plan.' 
-           });
-       }
-       
+       // Check user's current plan limits
        try {
+           const userResult = await pool.query(
+               'SELECT plan, plan_limit, scans_this_month FROM users WHERE id = $1',
+               [userId]
+           );
+           
+           if (userResult.rows.length === 0) {
+               return res.status(404).json({ error: 'User not found' });
+           }
+           
+           const user = userResult.rows[0];
+           
+           // Check scan limit
+           if (user.scans_this_month >= user.plan_limit) {
+               return res.status(403).json({ 
+                   error: 'Monthly scan limit reached. Please upgrade your plan.' 
+               });
+           }
+           
            // Create scan record
            const scanResult = await pool.query(
                `INSERT INTO scans (user_id, url, status) 
@@ -137,10 +149,17 @@ module.exports = (pool, queue, authService, emailService) => {
            );
            
            // Add to queue
+           console.log(`Adding scan ${scan.id} to queue for URL: ${url}`);
            await queue.add('scan-website', {
                scanId: scan.id,
                url: url,
                userId: userId
+           }, {
+               attempts: 3,
+               backoff: {
+                   type: 'exponential',
+                   delay: 2000,
+               },
            });
            
            res.json(scan);
@@ -177,13 +196,13 @@ module.exports = (pool, queue, authService, emailService) => {
                    error_message
                FROM scan_results 
                WHERE scan_id = $1
-               ORDER BY status_code DESC, url
+               ORDER BY status_code DESC NULLS LAST, url
            `, [scanId]);
            
            // Generate CSV content
            const csvHeader = 'URL,Status Code,Found On,Error Message\n';
            const csvRows = resultsQuery.rows.map(row => 
-               `"${row.url}","${row.status_code}","${row.found_on}","${row.error_message || ''}"`
+               `"${row.url}","${row.status_code || 'N/A'}","${row.found_on}","${row.error_message || ''}"`
            ).join('\n');
            
            const csvContent = csvHeader + csvRows;
@@ -228,16 +247,41 @@ module.exports = (pool, queue, authService, emailService) => {
            
            // Get scan results (broken links only for performance, or all if requested)
            const showAll = req.query.all === 'true';
-           const resultsQuery = await pool.query(`
-               SELECT 
-                   url, 
-                   status_code, 
-                   found_on, 
-                   error_message
-               FROM scan_results 
-               WHERE scan_id = $1 ${showAll ? '' : 'AND status_code != 200'}
-               ORDER BY status_code DESC, url
-           `, [scanId]);
+           let resultsQuery;
+           
+           if (showAll) {
+               resultsQuery = await pool.query(`
+                   SELECT 
+                       url, 
+                       status_code, 
+                       found_on, 
+                       error_message
+                   FROM scan_results 
+                   WHERE scan_id = $1
+                   ORDER BY status_code DESC NULLS LAST, url
+               `, [scanId]);
+           } else {
+               resultsQuery = await pool.query(`
+                   SELECT 
+                       url, 
+                       status_code, 
+                       found_on, 
+                       error_message
+                   FROM scan_results 
+                   WHERE scan_id = $1 AND (status_code IS NULL OR status_code >= 400)
+                   ORDER BY status_code DESC NULLS LAST, url
+               `, [scanId]);
+           }
+           
+           // Transform results for frontend compatibility
+           scan.results = resultsQuery.rows.map(row => ({
+               url: row.url,
+               status: row.status_code,
+               status_code: row.status_code,
+               found_on: row.found_on,
+               foundOn: row.found_on,
+               error: row.error_message
+           }));
            
            scan.scan_results = resultsQuery.rows;
            

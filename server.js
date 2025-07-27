@@ -9,6 +9,8 @@ const { Resend } = require('resend');
 const AuthService = require('./lib/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const scanRoutes = require('./routes/scans');
+const cheerio = require('cheerio');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -43,7 +45,6 @@ const redisClient = Redis.createClient({
     port: process.env.REDIS_PORT || 6379,
 });
 
-
 // Initialize services
 const resend = new Resend(process.env.RESEND_API_KEY);
 const authService = new AuthService(pool, resend);
@@ -56,11 +57,90 @@ const linkQueue = new Bull('link-checking', {
     }
 });
 
-app.use((req, res, next) => {
-    req.pool = pool;
-    req.authService = authService;
-    next();
-});
+// Helper functions
+async function checkLink(url) {
+    try {
+        const response = await axios.head(url, {
+            timeout: 10000,
+            validateStatus: () => true,
+            maxRedirects: 5,
+            headers: {
+                'User-Agent': 'CheckMyLinks Bot 1.0 (Link Checker)'
+            }
+        });
+        return {
+            url,
+            status: response.status,
+            error: null
+        };
+    } catch (error) {
+        // Try GET request if HEAD fails
+        try {
+            const response = await axios.get(url, {
+                timeout: 10000,
+                validateStatus: () => true,
+                maxRedirects: 5,
+                maxContentLength: 1024 * 1024, // 1MB limit
+                headers: {
+                    'User-Agent': 'CheckMyLinks Bot 1.0 (Link Checker)'
+                }
+            });
+            return {
+                url,
+                status: response.status,
+                error: null
+            };
+        } catch (getError) {
+            return {
+                url,
+                status: null,
+                error: getError.code || getError.message
+            };
+        }
+    }
+}
+
+async function extractLinks(url) {
+    try {
+        const response = await axios.get(url, { 
+            timeout: 15000,
+            headers: {
+                'User-Agent': 'CheckMyLinks Bot 1.0 (Link Checker)'
+            }
+        });
+        const $ = cheerio.load(response.data);
+        const links = new Set();
+        
+        $('a[href]').each((i, elem) => {
+            let href = $(elem).attr('href');
+            
+            if (!href) return;
+            
+            // Skip non-http links
+            if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#')) {
+                return;
+            }
+            
+            if (href.startsWith('/')) {
+                const baseUrl = new URL(url);
+                href = `${baseUrl.protocol}//${baseUrl.host}${href}`;
+            } else if (!href.startsWith('http')) {
+                return;
+            }
+            
+            try {
+                new URL(href); // Validate URL
+                links.add(href);
+            } catch (e) {
+                // Skip invalid URLs
+            }
+        });
+        
+        return Array.from(links);
+    } catch (error) {
+        throw new Error(`Failed to extract links: ${error.message}`);
+    }
+}
 
 // Add services to request
 app.use((req, res, next) => {
@@ -139,103 +219,95 @@ app.get('/api/auth/verify-email', async (req, res) => {
     
     const result = await authService.verifyEmail(token);
     
-if (result.success) {
-    res.send(`
-        <html>
-            <head>
-                <title>Email Verified - CheckMyLinks</title>
-                <meta http-equiv="refresh" content="3;url=/">
-                <style>
-                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                    .success { color: #10b981; }
-                    .countdown { color: #6b7280; font-size: 0.9em; }
-                </style>
-            </head>
-            <body>
-                <h1 class="success">✓ Email Verified Successfully!</h1>
-                <p>Your email has been verified. You can now access all features.</p>
-                <p class="countdown">Redirecting in a few seconds...</p>
-                <p><a href="/">Click here if not redirected automatically</a></p>
-            </body>
-        </html>
-    `);
-}
-});  
+    if (result.success) {
+        res.send(`
+            <html>
+                <head>
+                    <title>Email Verified - CheckMyLinks</title>
+                    <meta http-equiv="refresh" content="3;url=/">
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .success { color: #10b981; }
+                        .countdown { color: #6b7280; font-size: 0.9em; }
+                    </style>
+                </head>
+                <body>
+                    <h1 class="success">✓ Email Verified Successfully!</h1>
+                    <p>Your email has been verified. You can now access all features.</p>
+                    <p class="countdown">Redirecting in a few seconds...</p>
+                    <p><a href="/">Click here if not redirected automatically</a></p>
+                </body>
+            </html>
+        `);
+    } else {
+        res.redirect('/?verification_failed=true');
+    }
+});
 
 // Dashboard stats endpoint
 app.get('/api/scans/stats', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-  
-  const authResult = await authService.verifyToken(token);
-  
-  if (!authResult.success) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-  
-  try {
-    const userId = authResult.user.id;
-    const currentMonth = new Date();
-    currentMonth.setDate(1);
-    currentMonth.setHours(0, 0, 0, 0);
+    const token = req.headers.authorization?.split(' ')[1];
     
-    // Total scans for user
-    const totalScansResult = await pool.query(
-        'UPDATE users SET scans_this_month = scans_this_month + 1 WHERE id = $1',
-        [userId]
-    //   'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
-    //   [userId]
-    );
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
     
-    // Monthly scans for user
-    const monthlyScansResult = await pool.query(
-      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1 AND created_at >= $2',
-      [userId, currentMonth]
-    );
+    const authResult = await authService.verifyToken(token);
     
-    // Total broken links found
-    const totalBrokenLinksResult = await pool.query(`
-      SELECT SUM(s.broken_links) as total 
-      FROM scans s 
-      WHERE s.user_id = $1 AND s.status = 'completed' AND s.broken_links IS NOT NULL
-    `, [userId]);
+    if (!authResult.success) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
     
-    // Monthly broken links found
-    const monthlyBrokenLinksResult = await pool.query(`
-      SELECT SUM(s.broken_links) as total 
-      FROM scans s 
-      WHERE s.user_id = $1 AND s.status = 'completed' AND s.created_at >= $2 AND s.broken_links IS NOT NULL
-    `, [userId, currentMonth]);
-    
-    res.json({
-      totalScans: parseInt(totalScansResult.rows[0].count) || 0,
-      monthlyScans: parseInt(monthlyScansResult.rows[0].count) || 0,
-      totalBrokenLinks: parseInt(totalBrokenLinksResult.rows[0].total) || 0,
-      monthlyBrokenLinks: parseInt(monthlyBrokenLinksResult.rows[0].total) || 0
-    });
-  } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+    try {
+        const userId = authResult.user.id;
+        const currentMonth = new Date();
+        currentMonth.setDate(1);
+        currentMonth.setHours(0, 0, 0, 0);
+        
+        // Total scans for user
+        const totalScansResult = await pool.query(
+            'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
+            [userId]
+        );
+        
+        // Monthly scans for user
+        const monthlyScansResult = await pool.query(
+            'SELECT COUNT(*) as count FROM scans WHERE user_id = $1 AND created_at >= $2',
+            [userId, currentMonth]
+        );
+        
+        // Total broken links found
+        const totalBrokenLinksResult = await pool.query(`
+            SELECT SUM(s.broken_links) as total 
+            FROM scans s 
+            WHERE s.user_id = $1 AND s.status = 'completed' AND s.broken_links IS NOT NULL
+        `, [userId]);
+        
+        // Monthly broken links found
+        const monthlyBrokenLinksResult = await pool.query(`
+            SELECT SUM(s.broken_links) as total 
+            FROM scans s 
+            WHERE s.user_id = $1 AND s.status = 'completed' AND s.created_at >= $2 AND s.broken_links IS NOT NULL
+        `, [userId, currentMonth]);
+        
+        // Get last scan date
+        const lastScanResult = await pool.query(
+            'SELECT created_at FROM scans WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+            [userId]
+        );
+        
+        res.json({
+            totalScans: parseInt(totalScansResult.rows[0].count) || 0,
+            monthlyScans: parseInt(monthlyScansResult.rows[0].count) || 0,
+            totalBrokenLinks: parseInt(totalBrokenLinksResult.rows[0].total) || 0,
+            monthlyBrokenLinks: parseInt(monthlyBrokenLinksResult.rows[0].total) || 0,
+            lastScan: lastScanResult.rows[0]?.created_at || null
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
-
-// app.get('/api/auth/verify-email', async (req, res) => {
-//     const { token } = req.query;
-    
-//     if (!token) {
-//         return res.status(400).json({ error: 'Verification token required' });
-//     }
-    
-//     const result = await authService.verifyEmail(token);
-//     if (result.success) {
-//     res.redirect('/?verified=true&message=Your+email+has+been+verified');
-//     } else {
-//         res.redirect('/?verification_failed=true');
-//     }
-// });
 
 // Resend verification email
 app.post('/api/auth/resend-verification', async (req, res) => {
@@ -258,7 +330,7 @@ app.post('/api/auth/resend-verification', async (req, res) => {
 // Dashboard routes
 app.use('/api', dashboardRoutes);
 
-// Scan routes
+// Scan routes - Pass all required dependencies
 app.use('/api/scans', scanRoutes(pool, linkQueue, authService));
 
 // Public scan endpoint
@@ -266,22 +338,40 @@ app.post('/api/public/scan', async (req, res) => {
     try {
         const { url } = req.body;
         
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required' });
+        }
+        
         try {
             new URL(url);
         } catch (e) {
             return res.status(400).json({ error: 'Invalid URL' });
         }
         
+        console.log(`Starting public scan for: ${url}`);
+        
         const links = await extractLinks(url);
+        console.log(`Extracted ${links.length} links`);
+        
         const limitedLinks = links.slice(0, 50);
         
         const results = [];
         for (const link of limitedLinks) {
-            const result = await checkLink(link);
-            results.push({
-                ...result,
-                foundOn: url
-            });
+            try {
+                const result = await checkLink(link);
+                results.push({
+                    ...result,
+                    foundOn: url
+                });
+            } catch (error) {
+                console.error(`Error checking link ${link}:`, error);
+                results.push({
+                    url: link,
+                    status: null,
+                    error: error.message,
+                    foundOn: url
+                });
+            }
         }
         
         const stats = {
@@ -291,101 +381,73 @@ app.post('/api/public/scan', async (req, res) => {
             redirects: results.filter(r => r.status && (r.status === 301 || r.status === 302)).length
         };
         
+        console.log(`Scan completed. Stats:`, stats);
+        
         res.json({
             url,
             stats,
-            results: results.filter(r => !r.status || r.status >= 400),
+            results: results.filter(r => !r.status || r.status >= 400), // Only return broken links
             limited: links.length > 50,
             message: links.length > 50 ? 'Showing first 50 links. Sign up for full scan.' : null
         });
     } catch (error) {
         console.error('Public scan error:', error);
-        res.status(500).json({ error: 'Scan failed' });
+        res.status(500).json({ error: `Scan failed: ${error.message}` });
     }
 });
-
-// Helper functions
-const cheerio = require('cheerio');
-const axios = require('axios');
-
-async function checkLink(url) {
-    try {
-        const response = await axios.head(url, {
-            timeout: 5000,
-            validateStatus: () => true,
-            maxRedirects: 5
-        });
-        return {
-            url,
-            status: response.status,
-            error: null
-        };
-    } catch (error) {
-        return {
-            url,
-            status: null,
-            error: error.message
-        };
-    }
-}
-
-async function extractLinks(url) {
-    try {
-        const response = await axios.get(url, { timeout: 10000 });
-        const $ = cheerio.load(response.data);
-        const links = new Set();
-        
-        $('a[href]').each((i, elem) => {
-            let href = $(elem).attr('href');
-            
-            if (href.startsWith('/')) {
-                const baseUrl = new URL(url);
-                href = `${baseUrl.protocol}//${baseUrl.host}${href}`;
-            } else if (!href.startsWith('http')) {
-                return;
-            }
-            
-            links.add(href);
-        });
-        
-        return Array.from(links);
-    } catch (error) {
-        throw new Error(`Failed to extract links: ${error.message}`);
-    }
-}
 
 // Queue processor
 linkQueue.process(async (job) => {
     const { scanId, url, userId } = job.data;
     
     try {
-        await pool.query('UPDATE scans SET status = $1 WHERE id = $2', ['processing', scanId]);
+        console.log(`Processing scan ${scanId} for URL: ${url}`);
+        
+        await pool.query(
+            'UPDATE scans SET status = $1 WHERE id = $2', 
+            ['processing', scanId]
+        );
         
         const links = await extractLinks(url);
+        console.log(`Extracted ${links.length} links for scan ${scanId}`);
         
         const results = [];
         for (const link of links) {
-            const result = await checkLink(link);
-            results.push({
-                ...result,
-                foundOn: url
-            });
-            
-            await pool.query(
-                'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
-                [scanId, result.url, result.status, url, result.error]
-            );
+            try {
+                const result = await checkLink(link);
+                results.push({
+                    ...result,
+                    foundOn: url
+                });
+                
+                // Insert scan result into database
+                await pool.query(
+                    'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
+                    [scanId, result.url, result.status, url, result.error]
+                );
+            } catch (error) {
+                console.error(`Error checking link ${link} in scan ${scanId}:`, error);
+                
+                // Still insert the failed result
+                await pool.query(
+                    'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
+                    [scanId, link, null, url, error.message]
+                );
+            }
         }
         
         const brokenCount = results.filter(r => !r.status || r.status >= 400).length;
         
         await pool.query(
-            'UPDATE scans SET status = $1, total_links = $2, broken_links = $3 WHERE id = $4',
+            'UPDATE scans SET status = $1, total_links = $2, broken_links = $3, completed_at = CURRENT_TIMESTAMP WHERE id = $4',
             ['completed', links.length, brokenCount, scanId]
         );
         
+        console.log(`Scan ${scanId} completed. Total: ${links.length}, Broken: ${brokenCount}`);
+        
         return results;
     } catch (error) {
+        console.error(`Scan ${scanId} failed:`, error);
         await pool.query(
             'UPDATE scans SET status = $1 WHERE id = $2',
             ['failed', scanId]
@@ -404,8 +466,9 @@ const createTables = async () => {
                 email VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 plan VARCHAR(50) DEFAULT 'free',
-                plan_limit INTEGER DEFAULT 100,
+                plan_limit INTEGER DEFAULT 5,
                 scans_this_month INTEGER DEFAULT 0,
+                email_verified BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -418,7 +481,8 @@ const createTables = async () => {
                 status VARCHAR(50) DEFAULT 'pending',
                 total_links INTEGER DEFAULT 0,
                 broken_links INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP NULL
             )
         `);
 
@@ -439,6 +503,14 @@ const createTables = async () => {
         console.error('Error creating tables:', error);
     }
 };
+
+// Serve static files (your HTML)
+app.use(express.static('public'));
+
+// Catch-all handler for SPA
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;
