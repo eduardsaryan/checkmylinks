@@ -90,9 +90,14 @@ app.post('/api/auth/register', async (req, res) => {
     
     if (result.success) {
         res.json({
-            token: result.token,
-            user: result.user
+            message: 'Registration successful! Please check your email to verify your account.',
+            user: { email: result.user.email }
         });
+        
+        // res.json({
+        //     token: result.token,
+        //     user: result.user
+        // });
     } else {
         res.status(400).json({ error: result.error });
     }
