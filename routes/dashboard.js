@@ -20,6 +20,73 @@ const authenticateUser = async (req, res, next) => {
     next();
 };
 
+// Add these routes to your existing routes/dashboard.js file
+
+// Get dashboard statistics
+router.get('/scans/stats', authService.authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    
+    // Total scans for user
+    const totalScansResult = await req.pool.query(
+      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
+      [userId]
+    );
+    
+    // Monthly scans for user
+    const monthlyScansResult = await req.pool.query(
+      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1 AND created_at >= $2',
+      [userId, currentMonth]
+    );
+    
+    // Total broken links found
+    const totalBrokenLinksResult = await req.pool.query(`
+      SELECT SUM(s.broken_links) as total 
+      FROM scans s 
+      WHERE s.user_id = $1 AND s.status = 'completed' AND s.broken_links IS NOT NULL
+    `, [userId]);
+    
+    // Monthly broken links found
+    const monthlyBrokenLinksResult = await req.pool.query(`
+      SELECT SUM(s.broken_links) as total 
+      FROM scans s 
+      WHERE s.user_id = $1 AND s.status = 'completed' AND s.created_at >= $2 AND s.broken_links IS NOT NULL
+    `, [userId, currentMonth]);
+    
+    res.json({
+      totalScans: parseInt(totalScansResult.rows[0].count) || 0,
+      monthlyScans: parseInt(monthlyScansResult.rows[0].count) || 0,
+      totalBrokenLinks: parseInt(totalBrokenLinksResult.rows[0].total) || 0,
+      monthlyBrokenLinks: parseInt(monthlyBrokenLinksResult.rows[0].total) || 0
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// User profile endpoint
+router.get('/auth/me', authService.authenticateToken, async (req, res) => {
+  try {
+    const result = await req.pool.query(
+      'SELECT id, email, name, created_at FROM users WHERE id = $1',
+      [req.userId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get user dashboard data
 router.get('/dashboard', authenticateUser, async (req, res) => {
     try {

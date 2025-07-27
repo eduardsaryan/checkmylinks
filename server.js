@@ -162,6 +162,64 @@ if (result.success) {
 }
 });  
 
+// Dashboard stats endpoint
+app.get('/api/scans/stats', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  
+  const authResult = await authService.verifyToken(token);
+  
+  if (!authResult.success) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+  
+  try {
+    const userId = authResult.user.id;
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    
+    // Total scans for user
+    const totalScansResult = await pool.query(
+      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
+      [userId]
+    );
+    
+    // Monthly scans for user
+    const monthlyScansResult = await pool.query(
+      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1 AND created_at >= $2',
+      [userId, currentMonth]
+    );
+    
+    // Total broken links found
+    const totalBrokenLinksResult = await pool.query(`
+      SELECT SUM(s.broken_links) as total 
+      FROM scans s 
+      WHERE s.user_id = $1 AND s.status = 'completed' AND s.broken_links IS NOT NULL
+    `, [userId]);
+    
+    // Monthly broken links found
+    const monthlyBrokenLinksResult = await pool.query(`
+      SELECT SUM(s.broken_links) as total 
+      FROM scans s 
+      WHERE s.user_id = $1 AND s.status = 'completed' AND s.created_at >= $2 AND s.broken_links IS NOT NULL
+    `, [userId, currentMonth]);
+    
+    res.json({
+      totalScans: parseInt(totalScansResult.rows[0].count) || 0,
+      monthlyScans: parseInt(monthlyScansResult.rows[0].count) || 0,
+      totalBrokenLinks: parseInt(totalBrokenLinksResult.rows[0].total) || 0,
+      monthlyBrokenLinks: parseInt(monthlyBrokenLinksResult.rows[0].total) || 0
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // app.get('/api/auth/verify-email', async (req, res) => {
 //     const { token } = req.query;
     

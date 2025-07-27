@@ -642,6 +642,274 @@
                 gap: 1rem;
             }
         }
+
+        /* Dashboard Enhancement Styles - Add to your existing CSS */
+        .dashboard-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-stat-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .dashboard-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c63ba;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .filters-section {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 120px;
+        }
+
+        .filter-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-input {
+            padding: 0.5rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .history-table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .history-table-header {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-table-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .history-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .history-table td {
+            font-size: 0.9rem;
+        }
+
+        .history-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .scan-url-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .scan-url-cell a {
+            color: #2c63ba;
+            text-decoration: none;
+        }
+
+        .scan-url-cell a:hover {
+            text-decoration: underline;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1f2937;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+        }
+
+        .page-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .error-display {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem;
+            border: 1px solid #fca5a5;
+        }
+
+        .empty-scans {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .empty-scans h3 {
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .scan-details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .scan-details-content {
+            background: #ffffff;
+            padding: 0;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .scan-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .scan-details-header h3 {
+            margin: 0;
+            color: #1f2937;
+        }
+
+        .scan-details-body {
+            padding: 1.5rem;
+        }
+
+        .broken-links-table {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .dashboard-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .history-table-container {
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -895,27 +1163,98 @@
                     </div>
                 </div>
 
-                <div id="analyticsTab" style="display: none;">
-                    <h2>Analytics & Insights</h2>
-                    <div class="stats" style="margin-bottom: 2rem;">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalScansCount">0</div>
-                            <div class="stat-label">Total Scans</div>
+
+            <div id="analyticsTab" style="display: none;">
+                <h2>Dashboard & Scan History</h2>
+                
+                <!-- Statistics Overview -->
+                <div class="dashboard-stats-grid">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-number" id="totalScansCount">0</div>
+                        <div class="dashboard-stat-label">Total Scans</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-number" id="monthlyScansCount">0</div>
+                        <div class="dashboard-stat-label">This Month</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-number" id="totalBrokenFound">0</div>
+                        <div class="dashboard-stat-label">Broken Links Found</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-number" id="monthlyBrokenFound">0</div>
+                        <div class="dashboard-stat-label">This Month</div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <h3 style="margin-bottom: 1rem;">Filter Scan History</h3>
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label for="statusFilter">Status</label>
+                            <select id="statusFilter" class="filter-input">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="processing">Processing</option>
+                                <option value="failed">Failed</option>
+                            </select>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalLinksChecked">0</div>
-                            <div class="stat-label">Links Checked</div>
+                        <div class="filter-group">
+                            <label for="dateFromFilter">From Date</label>
+                            <input type="date" id="dateFromFilter" class="filter-input">
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalBrokenFound">0</div>
-                            <div class="stat-label">Broken Links Found</div>
+                        <div class="filter-group">
+                            <label for="dateToFilter">To Date</label>
+                            <input type="date" id="dateToFilter" class="filter-input">
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="monthlyScansCount">0</div>
-                            <div class="stat-label">This Month</div>
+                        <div class="filter-group">
+                            <button class="btn" onclick="applyHistoryFilters()">Apply Filters</button>
                         </div>
                     </div>
+                </div>
+
+                <!-- Scan History Table -->
+                <div class="history-table-container">
+                    <div class="history-table-header">
+                        <h3>Scan History</h3>
+                        <button class="btn btn-secondary" onclick="loadScanHistory()">Refresh</button>
+                    </div>
                     
+                    <div id="scanHistoryContent">
+                        <div class="loading-spinner">Loading scan history...</div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="historyPagination" class="pagination-controls" style="display: none;"></div>
+
+                <!-- Email Notifications Settings -->
+                <div class="feature-card" style="text-align: left; margin-top: 2rem;">
+                    <h3>📧 Email Notifications</h3>
+                    <p>Get notified when scans complete or broken links are found</p>
+                    <div style="margin-top: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="emailNotifications" checked> 
+                            Enable email notifications
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scan Details Modal - Add this before the closing </main> tag -->
+            <div id="scanDetailsModal" class="scan-details-modal" style="display: none;">
+                <div class="scan-details-content">
+                    <div class="scan-details-header">
+                        <h3>Scan Details</h3>
+                        <button class="close-btn" onclick="closeScanDetailsModal()">&times;</button>
+                    </div>
+                    <div class="scan-details-body" id="scanDetailsBody">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+                                
                     <div class="feature-card" style="text-align: left; margin-bottom: 2rem;">
                         <h3>📧 Email Notifications</h3>
                         <p>Get notified when scans complete or broken links are found</p>
@@ -1017,6 +1356,299 @@
     <script>
         // Configuration
         const API_BASE = '/api';
+
+
+        // Dashboard Enhancement Functions - Add these to your existing script section
+
+        // Global variables for scan history
+        let currentHistoryPage = 1;
+        let totalHistoryPages = 1;
+        const historyPageSize = 15;
+        let currentHistoryFilters = {};
+
+        // Enhanced loadUserAnalytics function - Replace your existing one
+        async function loadUserAnalytics() {
+            try {
+                // Load dashboard statistics
+                const statsResponse = await fetch(`${API_BASE}/scans/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    document.getElementById('totalScansCount').textContent = stats.totalScans || 0;
+                    document.getElementById('monthlyScansCount').textContent = stats.monthlyScans || 0;
+                    document.getElementById('totalBrokenFound').textContent = stats.totalBrokenLinks || 0;
+                    document.getElementById('monthlyBrokenFound').textContent = stats.monthlyBrokenLinks || 0;
+                }
+                
+                // Load scan history
+                loadScanHistory();
+                setupHistoryFilterListeners();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Load scan history with pagination and filters
+        async function loadScanHistory(page = 1) {
+            const historyContent = document.getElementById('scanHistoryContent');
+            historyContent.innerHTML = '<div class="loading-spinner">Loading scan history...</div>';
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: historyPageSize,
+                    ...currentHistoryFilters
+                });
+                
+                const response = await fetch(`${API_BASE}/scans?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayScanHistory(data.scans);
+                    updateHistoryPagination(data.pagination);
+                    currentHistoryPage = page;
+                } else {
+                    throw new Error('Failed to load scan history');
+                }
+            } catch (error) {
+                console.error('Failed to load scan history:', error);
+                historyContent.innerHTML = '<div class="error-display">Failed to load scan history. Please try again.</div>';
+            }
+        }
+
+        // Display scan history in table
+        function displayScanHistory(scans) {
+            const historyContent = document.getElementById('scanHistoryContent');
+            
+            if (scans.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="empty-scans">
+                        <h3>No scans found</h3>
+                        <p>Try adjusting your filters or create your first scan from the Overview tab.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const table = `
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Total Links</th>
+                                <th>Broken Links</th>
+                                <th>Created</th>
+                                <th>Completed</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scans.map(scan => `
+                                <tr>
+                                    <td class="scan-url-cell">
+                                        <a href="${scan.url}" target="_blank" title="${scan.url}">${scan.url}</a>
+                                    </td>
+                                    <td>
+                                        <span class="scan-status ${scan.status}">${scan.status}</span>
+                                    </td>
+                                    <td>${scan.total_links || '-'}</td>
+                                    <td>
+                                        ${scan.broken_links > 0 ? 
+                                            `<span style="color: #dc2626; font-weight: 500;">${scan.broken_links}</span>` : 
+                                            (scan.broken_links === 0 ? '0' : '-')
+                                        }
+                                    </td>
+                                    <td>${formatHistoryDate(scan.created_at)}</td>
+                                    <td>${scan.completed_at ? formatHistoryDate(scan.completed_at) : '-'}</td>
+                                    <td>
+                                        ${scan.status === 'completed' ? 
+                                            `<button class="btn" onclick="viewHistoryScanDetails(${scan.id})" style="font-size: 0.8rem; padding: 0.5rem 1rem;">View Details</button>` :
+                                            '-'
+                                        }
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            historyContent.innerHTML = table;
+        }
+
+        // Update pagination controls for history
+        function updateHistoryPagination(pagination) {
+            const paginationContainer = document.getElementById('historyPagination');
+            totalHistoryPages = pagination.totalPages;
+            
+            if (totalHistoryPages <= 1) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+            
+            paginationContainer.style.display = 'flex';
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <button class="page-btn" ${currentHistoryPage === 1 ? 'disabled' : ''} 
+                        onclick="loadScanHistory(${currentHistoryPage - 1})">Previous</button>
+            `;
+            
+            // Page numbers
+            const startPage = Math.max(1, currentHistoryPage - 2);
+            const endPage = Math.min(totalHistoryPages, currentHistoryPage + 2);
+            
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="loadScanHistory(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="page-btn" style="cursor: default; background: transparent;">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="page-btn ${i === currentHistoryPage ? 'active' : ''}" 
+                            onclick="loadScanHistory(${i})">${i}</button>
+                `;
+            }
+            
+            if (endPage < totalHistoryPages) {
+                if (endPage < totalHistoryPages - 1) {
+                    paginationHTML += `<span class="page-btn" style="cursor: default; background: transparent;">...</span>`;
+                }
+                paginationHTML += `<button class="page-btn" onclick="loadScanHistory(${totalHistoryPages})">${totalHistoryPages}</button>`;
+            }
+            
+            // Next button
+            paginationHTML += `
+                <button class="page-btn" ${currentHistoryPage === totalHistoryPages ? 'disabled' : ''} 
+                        onclick="loadScanHistory(${currentHistoryPage + 1})">Next</button>
+            `;
+            
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        // Setup filter event listeners for history
+        function setupHistoryFilterListeners() {
+            const filterInputs = ['statusFilter', 'dateFromFilter', 'dateToFilter'];
+            filterInputs.forEach(filterId => {
+                const element = document.getElementById(filterId);
+                if (element) {
+                    element.addEventListener('change', applyHistoryFilters);
+                }
+            });
+        }
+
+        // Apply filters to scan history
+        function applyHistoryFilters() {
+            currentHistoryFilters = {};
+            
+            const status = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFromFilter').value;
+            const dateTo = document.getElementById('dateToFilter').value;
+            
+            if (status) currentHistoryFilters.status = status;
+            if (dateFrom) currentHistoryFilters.dateFrom = dateFrom;
+            if (dateTo) currentHistoryFilters.dateTo = dateTo;
+            
+            loadScanHistory(1); // Reset to first page when applying filters
+        }
+
+        // View scan details from history
+        async function viewHistoryScanDetails(scanId) {
+            try {
+                const response = await fetch(`${API_BASE}/scans/${scanId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const scan = await response.json();
+                    showScanDetailsModal(scan);
+                } else {
+                    showAlert('Failed to load scan details', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to load scan details:', error);
+                showAlert('Failed to load scan details', 'error');
+            }
+        }
+
+        // Show scan details modal
+        function showScanDetailsModal(scan) {
+            const modal = document.getElementById('scanDetailsModal');
+            const body = document.getElementById('scanDetailsBody');
+            
+            body.innerHTML = `
+                <div style="margin-bottom: 1.5rem;">
+                    <p><strong>URL:</strong> <a href="${scan.url}" target="_blank" style="color: #2c63ba;">${scan.url}</a></p>
+                    <p><strong>Status:</strong> <span class="scan-status ${scan.status}">${scan.status}</span></p>
+                    <p><strong>Total Links:</strong> ${scan.total_links || '-'}</p>
+                    <p><strong>Broken Links:</strong> ${scan.broken_links || '-'}</p>
+                    <p><strong>Created:</strong> ${formatHistoryDate(scan.created_at)}</p>
+                    <p><strong>Completed:</strong> ${scan.completed_at ? formatHistoryDate(scan.completed_at) : '-'}</p>
+                </div>
+                
+                ${scan.scan_results && scan.scan_results.length > 0 ? `
+                    <h3 style="margin-bottom: 1rem;">Broken Links Found</h3>
+                    <div class="broken-links-table">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f9fafb;">
+                                    <th style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left;">URL</th>
+                                    <th style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left;">Status Code</th>
+                                    <th style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left;">Found On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${scan.scan_results.filter(result => result.status_code !== 200).map(result => `
+                                    <tr>
+                                        <td style="padding: 0.75rem; border-bottom: 1px solid #f3f4f6; word-break: break-all;">${result.url}</td>
+                                        <td style="padding: 0.75rem; border-bottom: 1px solid #f3f4f6;">${result.status_code}</td>
+                                        <td style="padding: 0.75rem; border-bottom: 1px solid #f3f4f6; word-break: break-all;">${result.found_on}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : '<p style="color: #10b981; font-weight: 500;">🎉 No broken links found! This website is healthy.</p>'}
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        // Close scan details modal
+        function closeScanDetailsModal() {
+            document.getElementById('scanDetailsModal').style.display = 'none';
+        }
+
+        // Format date for history display
+        function formatHistoryDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Helper function to get auth headers - Make sure this exists in your code
+        function getAuthHeaders() {
+            return {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
 
         // Auth state
         let authToken = localStorage.getItem('authToken');
