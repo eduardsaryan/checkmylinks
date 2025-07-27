@@ -1096,6 +1096,15 @@
                     <li><a href="#" onclick="showDashboardTab('analytics')">Analytics</a></li>
                     <li><a href="#" onclick="showDashboardTab('settings')">Settings</a></li>
                 </ul>
+                
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <h4 style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">Account</h4>
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem;">Current Plan</div>
+                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;" id="sidebarPlan">Free Plan</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;" id="sidebarScansRemaining">Loading...</div>
+                    </div>
+                </div>
             </div>
             <div class="main-content">
                 <div id="overviewTab">
@@ -1111,6 +1120,50 @@
                             </button>
                         </div>
                     </div>
+
+                    <div class="loading" id="dashboardLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Scanning website for broken links...</p>
+                    </div>
+
+                    <div class="results" id="dashboardResults">
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardTotalLinks">0</div>
+                                <div class="stat-label">Total Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardBrokenLinks">0</div>
+                                <div class="stat-label">Broken Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardOkLinks">0</div>
+                                <div class="stat-label">Working Links</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="dashboardRedirects">0</div>
+                                <div class="stat-label">Redirects</div>
+                            </div>
+                        </div>
+
+                        <table class="links-table">
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Found On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardLinksTableBody">
+                            </tbody>
+                        </table>
+
+                        <div class="export-buttons">
+                            <button class="btn" onclick="exportDashboardCSV()">Export CSV</button>
+                            <button class="btn btn-secondary" onclick="exportDashboardPDF()">Export PDF</button>
+                        </div>
+                    </div>
+                </div>
 
                     <div class="loading" id="dashboardLoading" style="display: none;">
                         <div class="spinner"></div>
