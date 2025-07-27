@@ -184,8 +184,10 @@ app.get('/api/scans/stats', async (req, res) => {
     
     // Total scans for user
     const totalScansResult = await pool.query(
-      'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
-      [userId]
+        'UPDATE users SET scans_this_month = scans_this_month + 1 WHERE id = $1',
+        [userId]
+    //   'SELECT COUNT(*) as count FROM scans WHERE user_id = $1',
+    //   [userId]
     );
     
     // Monthly scans for user

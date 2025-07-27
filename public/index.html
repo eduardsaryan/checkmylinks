@@ -1081,15 +1081,13 @@
             </section>
         </div>
 
-<!-- Replace the entire User Dashboard section in your index.html -->
-
 <!-- User Dashboard -->
 <div id="dashboardSection" class="container dashboard">
     <div class="main-dashboard">
         <!-- Dashboard Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div>
-                <h1 style="margin-bottom: 0.5rem;">Welcome back, <span id="userName"></span>!</h1>
+                <h1 style="margin-bottom: 0.5rem;">Dashboard</h1>
                 <p style="color: #6b7280;">Monitor your website's health with our link checking tools.</p>
             </div>
             <div style="text-align: right;">
@@ -1184,7 +1182,7 @@
                     <button class="btn btn-secondary" onclick="showAnalytics()">View All</button>
                 </div>
                 <div id="recentScansList">
-                    <p style="color: #6b7280;">Loading recent scans...</p>
+                    <p style="text-align: center; color: #6b7280;">No recent scans yet. Start by scanning a website above!</p>
                 </div>
             </div>
 
@@ -1486,6 +1484,55 @@
     <script>
         // Configuration
         const API_BASE = '/api';
+
+        // Add these functions for pro feature checking
+        function showAnalytics() {
+            if (!checkProFeature('Advanced Analytics')) return;
+            showAnalyticsPage();
+        }
+
+        function setupScheduledScans() {
+            if (!checkProFeature('Scheduled Scans')) return;
+            // Scheduled scans logic
+        }
+
+        function showReports() {
+            if (!checkProFeature('Advanced Reports')) return;
+            // Reports logic
+        }
+
+        function checkProFeature(feature) {
+            if (currentUser && currentUser.plan === 'free') {
+                showUpgradeModal(feature);
+                return false;
+            }
+            return true;
+        }
+
+        function showUpgradeModal(feature) {
+            alert(`${feature} is available in the Pro plan. Upgrade to unlock this feature!`);
+        }
+
+        // Add this function to check and show upgrade modal
+        function checkProFeature(feature) {
+            if (currentUser && currentUser.plan === 'free') {
+                showUpgradeModal(feature);
+                return false;
+            }
+            return true;
+        }
+
+        function showUpgradeModal(feature) {
+            alert(`${feature} is available in the Pro plan. Upgrade to unlock this feature!`);
+            // Later replace with proper modal
+        }
+
+        // Update the button click handlers
+        document.getElementById('viewAnalyticsBtn').onclick = () => {
+            if (checkProFeature('Advanced Analytics')) {
+                // Show analytics
+            }
+        };
 
         // Global variables for scan history
         let currentHistoryPage = 1;
@@ -2430,7 +2477,7 @@
                     
                     updateUIForAuth(true);
                     closeModal('login');
-                    showAlert('Login successful! Welcome back.', 'success');
+                    showAlert('Login successful! Dashboard', 'success');
                     document.getElementById('loginForm').reset();
                 } else {
                     const error = await response.json();
