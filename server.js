@@ -11,17 +11,23 @@ const dashboardRoutes = require('./routes/dashboard');
 const scanRoutes = require('./routes/scans');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable for development
+}));
 app.use(cors({
     origin: '*',
     credentials: true
 }));
 app.use(express.json());
+
+// Serve static files
+app.use(express.static('.'));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -40,10 +46,23 @@ const pool = new Pool({
 });
 
 // Redis connection
-const redisClient = Redis.createClient({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-});
+let redisClient;
+try {
+    redisClient = Redis.createClient({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379,
+    });
+    
+    redisClient.on('error', (err) => {
+        console.error('Redis Client Error:', err);
+    });
+    
+    redisClient.on('connect', () => {
+        console.log('Redis connected successfully');
+    });
+} catch (error) {
+    console.error('Redis connection failed:', error);
+}
 
 // Initialize services
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -54,7 +73,33 @@ const linkQueue = new Bull('link-checking', {
     redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: process.env.REDIS_PORT || 6379,
+    },
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 2000,
+        },
+        removeOnComplete: 10,
+        removeOnFail: 5,
     }
+});
+
+// Add queue event listeners
+linkQueue.on('completed', (job, result) => {
+    console.log(`Job ${job.id} completed successfully`);
+});
+
+linkQueue.on('failed', (job, err) => {
+    console.error(`Job ${job.id} failed:`, err.message);
+});
+
+linkQueue.on('active', (job) => {
+    console.log(`Job ${job.id} is now active`);
+});
+
+linkQueue.on('waiting', (jobId) => {
+    console.log(`Job ${jobId} is waiting`);
 });
 
 // Helper functions
@@ -396,62 +441,102 @@ app.post('/api/public/scan', async (req, res) => {
     }
 });
 
-// Queue processor
-linkQueue.process(async (job) => {
+// Queue processor - IMPORTANT: This must be defined BEFORE routes that add jobs
+linkQueue.process('scan-website', async (job) => {
     const { scanId, url, userId } = job.data;
     
     try {
-        console.log(`Processing scan ${scanId} for URL: ${url}`);
+        console.log(`[QUEUE] Processing scan ${scanId} for URL: ${url}`);
         
+        // Update scan status to processing
         await pool.query(
             'UPDATE scans SET status = $1 WHERE id = $2', 
             ['processing', scanId]
         );
         
+        console.log(`[QUEUE] Updated scan ${scanId} status to processing`);
+        
+        // Extract links from the website
+        console.log(`[QUEUE] Extracting links from ${url}`);
         const links = await extractLinks(url);
-        console.log(`Extracted ${links.length} links for scan ${scanId}`);
+        console.log(`[QUEUE] Extracted ${links.length} links for scan ${scanId}`);
         
         const results = [];
-        for (const link of links) {
-            try {
-                const result = await checkLink(link);
-                results.push({
-                    ...result,
-                    foundOn: url
-                });
-                
-                // Insert scan result into database
-                await pool.query(
-                    'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
-                    [scanId, result.url, result.status, url, result.error]
-                );
-            } catch (error) {
-                console.error(`Error checking link ${link} in scan ${scanId}:`, error);
-                
-                // Still insert the failed result
-                await pool.query(
-                    'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
-                    [scanId, link, null, url, error.message]
-                );
+        let processedCount = 0;
+        
+        // Process links in batches to avoid overwhelming the target server
+        const batchSize = 5;
+        for (let i = 0; i < links.length; i += batchSize) {
+            const batch = links.slice(i, i + batchSize);
+            
+            const batchPromises = batch.map(async (link) => {
+                try {
+                    const result = await checkLink(link);
+                    processedCount++;
+                    
+                    if (processedCount % 10 === 0) {
+                        console.log(`[QUEUE] Processed ${processedCount}/${links.length} links for scan ${scanId}`);
+                    }
+                    
+                    results.push({
+                        ...result,
+                        foundOn: url
+                    });
+                    
+                    // Insert scan result into database
+                    await pool.query(
+                        'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
+                        [scanId, result.url, result.status, url, result.error]
+                    );
+                    
+                    return result;
+                } catch (error) {
+                    console.error(`[QUEUE] Error checking link ${link} in scan ${scanId}:`, error);
+                    
+                    // Still insert the failed result
+                    await pool.query(
+                        'INSERT INTO scan_results (scan_id, url, status_code, found_on, error_message) VALUES ($1, $2, $3, $4, $5)',
+                        [scanId, link, null, url, error.message]
+                    );
+                    
+                    return { url: link, status: null, error: error.message };
+                }
+            });
+            
+            await Promise.all(batchPromises);
+            
+            // Small delay between batches
+            if (i + batchSize < links.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
         
         const brokenCount = results.filter(r => !r.status || r.status >= 400).length;
         
+        // Update scan with final results
         await pool.query(
             'UPDATE scans SET status = $1, total_links = $2, broken_links = $3, completed_at = CURRENT_TIMESTAMP WHERE id = $4',
             ['completed', links.length, brokenCount, scanId]
         );
         
-        console.log(`Scan ${scanId} completed. Total: ${links.length}, Broken: ${brokenCount}`);
+        console.log(`[QUEUE] Scan ${scanId} completed successfully. Total: ${links.length}, Broken: ${brokenCount}`);
         
-        return results;
+        return { 
+            scanId, 
+            totalLinks: links.length, 
+            brokenLinks: brokenCount,
+            results: results.filter(r => !r.status || r.status >= 400) // Only broken links
+        };
+        
     } catch (error) {
-        console.error(`Scan ${scanId} failed:`, error);
+        console.error(`[QUEUE] Scan ${scanId} failed:`, error);
+        
+        // Update scan status to failed
         await pool.query(
             'UPDATE scans SET status = $1 WHERE id = $2',
             ['failed', scanId]
         );
+        
         throw error;
     }
 });
@@ -505,11 +590,18 @@ const createTables = async () => {
 };
 
 // Serve static files (your HTML)
-app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// Catch-all handler for SPA
+// Catch-all handler for SPA (should be last)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    // Only serve index.html for non-API routes
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    } else {
+        res.status(404).json({ error: 'API endpoint not found' });
+    }
 });
 
 // Start server

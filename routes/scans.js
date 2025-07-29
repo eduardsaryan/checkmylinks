@@ -148,9 +148,9 @@ module.exports = (pool, queue, authService) => {
                [userId]
            );
            
-           // Add to queue
+           // Add to queue with proper job name
            console.log(`Adding scan ${scan.id} to queue for URL: ${url}`);
-           await queue.add('scan-website', {
+           const job = await queue.add('scan-website', {
                scanId: scan.id,
                url: url,
                userId: userId
@@ -161,6 +161,8 @@ module.exports = (pool, queue, authService) => {
                    delay: 2000,
                },
            });
+           
+           console.log(`Job ${job.id} added to queue for scan ${scan.id}`);
            
            res.json(scan);
        } catch (error) {
