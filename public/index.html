@@ -34,6 +34,7 @@
         }
 
         nav {
+            min-height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -47,6 +48,7 @@
         }
 
         .nav-links {
+            min-height: 48px;
             display: flex;
             gap: 2rem;
             align-items: center;
@@ -586,12 +588,14 @@
             color: #6b7280;
             font-weight: 500;
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 0.75rem;
             border-radius: 6px;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 48px;
+            box-sizing: border-box;
         }
 
         .username-button:hover {
