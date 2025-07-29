@@ -575,6 +575,92 @@
             font-weight: bold;
         }
 
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .username-button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .username-button:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .dropdown-arrow {
+            font-size: 0.75rem;
+            transition: transform 0.3s;
+        }
+
+        .username-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e7eb;
+            min-width: 160px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+            color: #dc2626;
+        }
+
+        .dropdown-item:last-child:hover {
+            background: #fef2f2;
+        }
+
         footer {
             background: #111827;
             color: #d1d5db;
@@ -1428,10 +1514,18 @@
             
             if (isLoggedIn && currentUser) {
                 navLinks.innerHTML = `
-                    <a href="#" onclick="showHomepage()">Home</a>
-                    <a href="#" onclick="showDashboard()">Dashboard</a>
-                    <span style="color: #6b7280;">Welcome, ${currentUser.name}!</span>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                    <div class="user-dropdown">
+                        <button class="username-button" onclick="toggleUserDropdown()">
+                            Welcome, ${currentUser.name}!
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdownMenu">
+                            <button class="dropdown-item" onclick="showAccountSettings()">Account</button>
+                            <button class="dropdown-item" onclick="showSettings()">Settings</button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" onclick="logout()">Logout</button>
+                        </div>
+                    </div>
                 `;
                 homepage.style.display = 'none';
                 featuresPage.style.display = 'none';
@@ -2221,8 +2315,49 @@
             }
         });
 
+        // User dropdown functionality
+        function toggleUserDropdown() {
+            const button = document.querySelector('.username-button');
+            const menu = document.getElementById('userDropdownMenu');
+            
+            button.classList.toggle('active');
+            menu.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                const button = document.querySelector('.username-button');
+                const menu = document.getElementById('userDropdownMenu');
+                if (button && menu) {
+                    button.classList.remove('active');
+                    menu.classList.remove('active');
+                }
+            }
+            
+            // Also handle scan details modal
+            const modal = document.getElementById('scanDetailsModal');
+            if (event.target === modal) {
+                closeScanDetailsModal();
+            }
+        });
+
+        // Account settings function
+        function showAccountSettings() {
+            toggleUserDropdown(); // Close dropdown
+            showAlert('Account settings coming soon!', 'info');
+        }
+
+        // Settings function
+        function showSettings() {
+            toggleUserDropdown(); // Close dropdown
+            showAlert('Settings panel coming soon!', 'info');
+        }
+
         // Logout function
         function logout() {
+            toggleUserDropdown(); // Close dropdown
             authToken = null;
             currentUser = null;
             currentScanId = null;
@@ -2232,13 +2367,8 @@
             showAlert('You have been logged out successfully.', 'success');
         }
 
-        // Close modal when clicking outside
-        document.addEventListener('click', function(event) {
-            const modal = document.getElementById('scanDetailsModal');
-            if (event.target === modal) {
-                closeScanDetailsModal();
-            }
-        });
+        // Close modal when clicking outside (updated)
+        // Note: The dropdown click handling is now in the document click listener above
     </script>
 </body>
 </html>
