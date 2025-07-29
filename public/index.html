@@ -1327,6 +1327,12 @@
 
         // Check if user is logged in on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Clear input fields on page load/refresh
+            document.getElementById('urlInput').value = '';
+            if (document.getElementById('dashboardUrlInput')) {
+                document.getElementById('dashboardUrlInput').value = '';
+            }
+            
             if (authToken) {
                 checkAuthStatus();
             }
@@ -1876,9 +1882,6 @@
 
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').classList.remove('active');
-            
-            // Clear the input field
-            document.getElementById('urlInput').value = '';
 
             try {
                 const response = await fetch(`${API_BASE}/public/scan`, {
@@ -1923,9 +1926,6 @@
 
             document.getElementById('dashboardLoading').style.display = 'block';
             document.getElementById('dashboardResults').classList.remove('active');
-            
-            // Clear the dashboard input field
-            document.getElementById('dashboardUrlInput').value = '';
 
             try {
                 const response = await fetch(`${API_BASE}/scans`, {
